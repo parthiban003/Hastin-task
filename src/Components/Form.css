@@ -1,7 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+
 .login-container {
   display: flex;
-  height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
+  margin-top: 5%;
+  height: 75vh;
+  width: 80%;
+  margin-left: 10%;
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 8px;
 }
 
 .login-left {
@@ -31,27 +38,47 @@
   margin-bottom: 1.5rem;
   color: #123c69;
 }
+img{
+  height: 350px;
+}
 
 .login-right input[type="text"],
 .login-right input[type="password"] {
-  width: 100%;
+  width: 90%;
   padding: 12px;
   margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: none;
+  border-bottom: rgb(255, 149, 149)2px solid;
+  outline: none;
+}
+.login-right input[type="text"] :active,
+.login-right input[type="password"]  :active {
+  border-bottom: gray;
+  border: none;
+  pointer-events: none;
+  border-style: none;
+  z-index: 0;
 }
 
 .captcha-placeholder {
   display: flex;
   align-items: center;
-  margin: 10px 0;
+  margin: 10px 10;
+  width: 70%;
+  height: 25%;
+  border-radius: 8px;
+  justify-content: center;
+  background-color: rgba(0,0,0, 0.2);
 }
-
+.captcha-placeholder input {
+  margin-left: 25px;
+}
 .forgot-link {
   display: inline-block;
   margin: 10px 0;
   color: #0047ab;
   text-decoration: none;
+  margin-left: 5%;
   font-size: 0.9rem;
 }
 
@@ -61,11 +88,22 @@
 }
 
 .login-btn {
-  width: 100%;
+  width: 80%;
   padding: 12px;
-  background: #f44336;
+  background: #f33628;
   color: white;
   border: none;
   border-radius: 4px;
   font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.error {
+  color: red;
+  margin-top: 10px;
+}
+
+.success {
+  color: green;
+  margin-top: 10px;
 }
