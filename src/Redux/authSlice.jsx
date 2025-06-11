@@ -11,7 +11,7 @@ const authSlice = createSlice({
   reducers: {
     login: (state, action) => {
       const { username, password } = action.payload;
-      if (username === 'ebrain' && password === '123456') {
+      if (username === 'ebrain' && password === 'Ji#993te') {
         state.isAuthenticated = true;
         state.error = '';
       } else {

@@ -1,24 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ReCAPTCHA from 'react-google-recaptcha'; // 🆕
 import './Form.css';
+import OTPModal from './OTPModal';
+import Loader from './Loader';
 import pic1 from '../assets/pic1.avif';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ username: '', password: '' });
-  const [showOTP, setShowOTP] = useState(false);
+  const [showOTPModal, setShowOTPModal] = useState(false);
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(60);
   const [isOTPTimerActive, setIsOTPTimerActive] = useState(false);
   const [loginError, setLoginError] = useState('');
-  const [otpMessage, setOtpMessage] = useState('');
-  const [captchaVerified, setCaptchaVerified] = useState(false); // 🆕
-
-  const handleCaptchaChange = (value) => {
-    if (value) {
-      setCaptchaVerified(true);
-    }
-  };
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,22 +20,21 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!captchaVerified) {
-      setLoginError('Please verify the captcha.');
-      return;
-    }
-
     try {
-      const res = await axios.get(`https://682c6773d29df7a95be6e6ee.mockapi.io/RegisterUsers`);
+      const res = await axios.get(`https://hastin-container.com/staging/app/auth/login`);
       const user = res.data.find(
         (u) => u.username === form.username && u.password === form.password
       );
 
       if (user) {
-        setShowOTP(true);
-        setIsOTPTimerActive(true);
+        setIsLoading(true);
         setLoginError('');
-        setTimer(60);
+        setTimeout(() => {
+          setIsLoading(false);
+          setShowOTPModal(true);
+          setIsOTPTimerActive(true);
+          setTimer(60);
+        }, 2000); // simulate loader time
       } else {
         setLoginError('Invalid username or password');
       }
@@ -53,10 +46,17 @@ const LoginPage = () => {
 
   const handleOTPSubmit = () => {
     if (otp === '123456') {
-      setOtpMessage('✅ Login successful with OTP!');
+      alert('✅ Login successful with OTP!');
+      setShowOTPModal(false);
     } else {
-      setOtpMessage('❌ Invalid OTP. Please try again.');
+      alert('❌ Invalid OTP');
     }
+  };
+
+  const handleResendOTP = () => {
+    setOtp('');
+    setTimer(60);
+    setIsOTPTimerActive(true);
   };
 
   useEffect(() => {
@@ -71,67 +71,42 @@ const LoginPage = () => {
 
   return (
     <div className="login-container">
+      {isLoading && <Loader />}
+      {showOTPModal && (
+        <OTPModal
+          otp={otp}
+          setOtp={setOtp}
+          timer={timer}
+          onVerify={handleOTPSubmit}
+          onResend={handleResendOTP}
+        />
+      )}
       <div className="login-left">
         <img src={pic1} alt="Illustration" />
       </div>
       <div className="login-right">
         <h2>Welcome! Log In</h2>
-        {!showOTP ? (
-          <form onSubmit={handleLogin}>
-            <input
-              type="text"
-              name="username"
-              placeholder="User Name"
-              value={form.username}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={form.password}
-              onChange={handleChange}
-              required
-            />
-
-            {/* reCAPTCHA Checkbox */}
-            <ReCAPTCHA
-              sitekey="6LdhYVsrAAAAAOol5pu8IA1RnM3e3OiYeKoI8lhe" 
-              onChange={handleCaptchaChange}
-            />
-
-            {loginError && <p className="error">{loginError}</p>}
-            <a href="/" className="forgot-link">🔒 Forgot password?</a>
-            <button type="submit" className="login-btn">Login</button>
-          </form>
-        ) : (
-          <div>
-            <h4>Enter OTP (sent to your email/mobile)</h4>
-            <input
-              type="text"
-              value={otp}
-              onChange={(e) => {
-                setOtp(e.target.value);
-                setOtpMessage('');
-              }}
-              placeholder="Enter OTP"
-              maxLength={6}
-            />
-            <p>⏳ Time remaining: {timer}s</p>
-            <button onClick={handleOTPSubmit} disabled={timer === 0}>
-              Verify OTP
-            </button>
-            {otpMessage && (
-              <p className={otpMessage.includes('success') ? 'success' : 'error'}>
-                {otpMessage}
-              </p>
-            )}
-            {timer === 0 && (
-              <p className="error">OTP expired. Please refresh and try again.</p>
-            )}
-          </div>
-        )}
+        <form onSubmit={handleLogin}>
+          <input
+            type="text"
+            name="username"
+            placeholder="User Name"
+            value={form.username}
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+          />
+          {loginError && <p className="error">{loginError}</p>}
+          <a href="/" className="forgot-link">🔒 Forgot password?</a><br /><br />
+          <button type="submit" className="login-btn">Login</button>
+        </form>
       </div>
     </div>
   );
