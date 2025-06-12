@@ -40,7 +40,7 @@ const LoginPage = () => {
       );
 
       if (res.status === 200) {
-        toast.success('Login successful!');
+        toast.success('OTP sended successful!');
         setTimeout(() => {
           setIsLoading(false);
           setShowOTPModal(true);
@@ -56,11 +56,11 @@ const LoginPage = () => {
   };
 
   const handleOTPSubmit = () => {
-    if (otp === '123456') {
-      toast.success('✅ Login successful with OTP!');
+    if (otp === '1234') {
+      toast.success(' Login successful!');
       setShowOTPModal(false);
     } else {
-      toast.error('❌ Invalid OTP');
+      toast.error(' Invalid OTP');
     }
   };
 

@@ -15,7 +15,7 @@ const OTPModal = ({ otp, setOtp, timer, onResend, onVerify }) => (
         placeholder="Enter OTP"
       />
       <p>⏳ Time remaining: {timer}s</p>
-      <button onClick={onVerify}>Verify OTP</button>
+      <button onClick={onVerify} className='verify-btn'>Verify OTP</button>
       {timer === 0 && (
         <button className="resend-btn" onClick={onResend}>
           Resend OTP

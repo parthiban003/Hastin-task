@@ -1,5 +1,5 @@
 import React from 'react';
-
+import './Form.css';
 
 const Loader = () => (
   <div className="loader-container">
