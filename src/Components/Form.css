@@ -5,8 +5,8 @@
   display: flex;
   margin-top: 5%;
   height: 75vh;
-  width: 80%;
-  margin-left: 10%;
+  width: 70%;
+  margin-left: 16%;
   font-family: 'Montserrat', sans-serif;
   border-radius: 8px;
 }
@@ -17,10 +17,11 @@
   align-items: center;
   justify-content: center;
   background: #f8f9fd;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .login-left img {
-  width: 80%;
+  width: 100%;
   max-width: 500px;
 }
 
@@ -31,7 +32,7 @@
   flex-direction: column;
   justify-content: center;
   background: #fff;
-  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.6);
 }
 
 .login-right h2 {
@@ -39,7 +40,7 @@
   color: #123c69;
 }
 img{
-  height: 350px;
+  height: 550px;
 }
 
 .login-right input[type="text"],
@@ -50,28 +51,6 @@ img{
   border: none;
   border-bottom: rgb(255, 149, 149)2px solid;
   outline: none;
-}
-.login-right input[type="text"] :active,
-.login-right input[type="password"]  :active {
-  border-bottom: gray;
-  border: none;
-  pointer-events: none;
-  border-style: none;
-  z-index: 0;
-}
-
-.captcha-placeholder {
-  display: flex;
-  align-items: center;
-  margin: 10px 10;
-  width: 70%;
-  height: 25%;
-  border-radius: 8px;
-  justify-content: center;
-  background-color: rgba(0,0,0, 0.2);
-}
-.captcha-placeholder input {
-  margin-left: 25px;
 }
 .forgot-link {
   display: inline-block;
@@ -95,11 +74,8 @@ img{
   border-radius: 4px;
   font-weight: bold;
   font-size: 1rem;
+  margin-left: 10%;
   cursor: pointer;
-}
-.error {
-  color: red;
-  margin-top: 10px;
 }
 
 .success {
@@ -163,6 +139,13 @@ img{
   width: 50px; height: 50px;
   animation: spin 1s linear infinite;
 }
+.show-password-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 
 @keyframes spin {
   0% { transform: rotate(0deg); }

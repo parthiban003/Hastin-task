@@ -4,9 +4,12 @@ import './Form.css';
 import OTPModal from './OTPModal';
 import Loader from './Loader';
 import pic1 from '../assets/pic1.avif';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ username: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(60);
@@ -34,22 +37,25 @@ const LoginPage = () => {
           setShowOTPModal(true);
           setIsOTPTimerActive(true);
           setTimer(60);
-        }, 2000); // simulate loader time
+          toast.info('OTP sent to your registered number!');
+        }, 2000);
       } else {
         setLoginError('Invalid username or password');
+        toast.error('❌ Invalid username or password');
       }
     } catch (err) {
       console.error(err);
       setLoginError('Login failed');
+      toast.error('❌ Login failed. Please try again later.');
     }
   };
 
   const handleOTPSubmit = () => {
     if (otp === '123456') {
-      alert('✅ Login successful with OTP!');
+      toast.success('✅ Login successful with OTP!');
       setShowOTPModal(false);
     } else {
-      alert('❌ Invalid OTP');
+      toast.error('❌ Invalid OTP');
     }
   };
 
@@ -57,6 +63,7 @@ const LoginPage = () => {
     setOtp('');
     setTimer(60);
     setIsOTPTimerActive(true);
+    toast.info('📩 OTP resent!');
   };
 
   useEffect(() => {
@@ -96,18 +103,29 @@ const LoginPage = () => {
             required
           />
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             name="password"
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
             required
           />
+          <label className="show-password-label">
+            <input
+              type="checkbox"
+              checked={showPassword}
+              onChange={() => setShowPassword(!showPassword)}
+            /> Show Password
+          </label><br />
+
           {loginError && <p className="error">{loginError}</p>}
           <a href="/" className="forgot-link">🔒 Forgot password?</a><br /><br />
           <button type="submit" className="login-btn">Login</button>
         </form>
       </div>
+
+      {/* Toast notifications container */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </div>
   );
 };
