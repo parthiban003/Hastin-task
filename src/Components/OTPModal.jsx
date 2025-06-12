@@ -1,4 +1,5 @@
 import React from 'react';
+import './Form.css';
 
 
 const OTPModal = ({ otp, setOtp, timer, onResend, onVerify }) => (

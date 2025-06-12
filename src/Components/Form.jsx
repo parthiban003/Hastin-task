@@ -4,7 +4,7 @@ import './Form.css';
 import OTPModal from './OTPModal';
 import Loader from './Loader';
 import pic1 from '../assets/pic1.avif';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const LoginPage = () => {
@@ -14,7 +14,6 @@ const LoginPage = () => {
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(60);
   const [isOTPTimerActive, setIsOTPTimerActive] = useState(false);
-  const [loginError, setLoginError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -23,30 +22,36 @@ const LoginPage = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
-      const res = await axios.get(`https://hastin-container.com/staging/app/auth/login`);
-      const user = res.data.find(
-        (u) => u.username === form.username && u.password === form.password
+      const res = await axios.post(
+        'https://hastin-container.com/staging/app/auth/login',
+        {
+          userName: form.username,
+          password: form.password,
+          origin: "AGENT",
+          recaptcha: ""
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
 
-      if (user) {
-        setIsLoading(true);
-        setLoginError('');
+      if (res.status === 200) {
+        toast.success('Login successful!');
         setTimeout(() => {
           setIsLoading(false);
           setShowOTPModal(true);
           setIsOTPTimerActive(true);
           setTimer(60);
-          toast.info('OTP sent to your registered number!');
         }, 2000);
-      } else {
-        setLoginError('Invalid username or password');
-        toast.error('❌ Invalid username or password');
       }
     } catch (err) {
       console.error(err);
-      setLoginError('Login failed');
-      toast.error('❌ Login failed. Please try again later.');
+      setIsLoading(false);
+      toast.error('Login failed. Please try again later.');
     }
   };
 
@@ -63,7 +68,6 @@ const LoginPage = () => {
     setOtp('');
     setTimer(60);
     setIsOTPTimerActive(true);
-    toast.info('📩 OTP resent!');
   };
 
   useEffect(() => {
@@ -78,6 +82,7 @@ const LoginPage = () => {
 
   return (
     <div className="login-container">
+      <ToastContainer />
       {isLoading && <Loader />}
       {showOTPModal && (
         <OTPModal
@@ -116,16 +121,12 @@ const LoginPage = () => {
               checked={showPassword}
               onChange={() => setShowPassword(!showPassword)}
             /> Show Password
-          </label><br />
-
-          {loginError && <p className="error">{loginError}</p>}
+          </label>
+          <br />
           <a href="/" className="forgot-link">🔒 Forgot password?</a><br /><br />
           <button type="submit" className="login-btn">Login</button>
         </form>
       </div>
-
-      {/* Toast notifications container */}
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </div>
   );
 };

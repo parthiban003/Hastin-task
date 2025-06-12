@@ -42,6 +42,13 @@
 img{
   height: 550px;
 }
+ @media screen and (max-width:800px) {
+  img {
+    display: none;
+    
+
+  }
+ }
 
 .login-right input[type="text"],
 .login-right input[type="password"] {
@@ -58,6 +65,9 @@ img{
   color: #0047ab;
   text-decoration: none;
   font-size: 0.9rem;
+}
+.forgot-link:hover {
+   color: #f33628;
 }
 
 .error {
@@ -84,11 +94,13 @@ img{
 }
 .otp-modal {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.5);
+  top: 10; left: 30%;
+  width: 40vw; height: 40vh;
+  background-color: rgb(182, 153, 153);
   display: flex; align-items: center; justify-content: center;
   z-index: 999;
+  border-radius: 6px;
+  color: white;
 }
 
 .otp-content {
