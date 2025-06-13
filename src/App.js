@@ -3,13 +3,19 @@ import './App.css';
 import { Provider } from 'react-redux';
 import { store } from './Redux/store';
 import Form from './Components/Form';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import VendorDashboard from './Components/VendorDashboard';
 
 
 function App() {
   return (
     <Provider store={store}>
-      <Form />
-     
+      <Router>
+        <Routes>
+          <Route path="/" element={<Form />} />
+          <Route path="/dashboard" element={<VendorDashboard />} />
+        </Routes>
+      </Router>
     </Provider>
   );
 }

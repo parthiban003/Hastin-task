@@ -6,6 +6,9 @@ import Loader from './Loader';
 import pic1 from '../assets/pic1.avif';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const LoginPage = () => {
   const [form, setForm] = useState({ username: '', password: '' });
@@ -19,6 +22,13 @@ const LoginPage = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
+
+  const navigate = useNavigate();
+
+      // after successful OTP verification
+      localStorage.setItem('authToken', 'some-token');
+      navigate('/dashboard');
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -91,6 +101,7 @@ const LoginPage = () => {
           timer={timer}
           onVerify={handleOTPSubmit}
           onResend={handleResendOTP}
+          onClose={() => setShowOTPModal(false)}
         />
       )}
       <div className="login-left">

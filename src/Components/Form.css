@@ -131,7 +131,7 @@ img{
 }
 
 .otp-modal button {
-  background-color: #dd6275;
+  background-color: #c74747;
   color: white;
   border: none;
   padding: 10px 15px;
@@ -140,6 +140,20 @@ img{
   font-weight: bold;
   border-radius: 5px;
   width: 60%;
+}
+.close-btn {
+  position: absolute;
+  top: 5px;
+  right: 15px;
+  width: 10%;
+  max-width: 10%;
+  border: none;
+  color: #333;
+  cursor: pointer;
+}
+
+.otp-modal input{
+   outline: none;
 }
 
 .loader-overlay {

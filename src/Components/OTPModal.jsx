@@ -1,10 +1,10 @@
 import React from 'react';
 import './Form.css';
 
-
-const OTPModal = ({ otp, setOtp, timer, onResend, onVerify }) => (
+const OTPModal = ({ otp, setOtp, timer, onResend, onVerify, onClose }) => (
   <div className="otp-modal">
     <div className="otp-box">
+      <button className="close-btn" onClick={onClose}>X</button>
       <h4>OTP VERIFICATION</h4>
       <p>Enter the OTP sent to your registered mobile</p>
       <input
