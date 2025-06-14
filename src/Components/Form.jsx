@@ -18,16 +18,11 @@ const LoginPage = () => {
   const [timer, setTimer] = useState(60);
   const [isOTPTimerActive, setIsOTPTimerActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
-  const navigate = useNavigate();
-
-      // after successful OTP verification
-      localStorage.setItem('authToken', 'some-token');
-      navigate('/dashboard');
 
 
   const handleLogin = async (e) => {
@@ -67,12 +62,15 @@ const LoginPage = () => {
 
   const handleOTPSubmit = () => {
     if (otp === '1234') {
-      toast.success(' Login successful!');
+      toast.success('Login successful!');
+      localStorage.setItem('authToken', 'some-token'); // ✅ Save token
       setShowOTPModal(false);
+      navigate('/dashboard'); // ✅ Redirect after success
     } else {
-      toast.error(' Invalid OTP');
+      toast.error('Invalid OTP');
     }
   };
+   
 
   const handleResendOTP = () => {
     setOtp('');

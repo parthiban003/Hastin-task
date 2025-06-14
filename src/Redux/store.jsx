@@ -2,8 +2,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 
 import authReducer from './authSlice';
-import vendorReducer from '../Vendors/vendorSlice'; // ✅ adjust the path if needed
-import vendorSaga from '../Vendors/vendorSaga';     // ✅ adjust the path if needed
+import vendorReducer from './Vendors/vendorSlice'; // ✅ adjust the path if needed
+import vendorSaga from './Vendors/vendorSaga';     // ✅ adjust the path if needed
 
 // 1. Create saga middleware
 const sagaMiddleware = createSagaMiddleware();

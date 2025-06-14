@@ -14,7 +14,7 @@ import {
   createVendorRequest,
   createVendorSuccess,
   createVendorFailure
-} from '../vendorSlice';
+} from './vendorSlice';
 
 function* fetchVendorsSaga() {
   try {

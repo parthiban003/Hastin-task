@@ -5,6 +5,8 @@ import { store } from './Redux/store';
 import Form from './Components/Form';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import VendorDashboard from './Components/VendorDashboard';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 
 function App() {
