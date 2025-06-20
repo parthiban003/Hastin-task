@@ -1,28 +1,58 @@
 import React from 'react';
-import './Form.css';
+import './OTP.css';
+import Loader from './Loader';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-const OTPModal = ({ otp, setOtp, timer, onResend, onVerify, onClose }) => (
-  <div className="otp-modal">
-    <div className="otp-box">
-      <button className="close-btn" onClick={onClose}>X</button>
-      <h4>OTP VERIFICATION</h4>
-      <p>Enter the OTP sent to your registered mobile</p>
-      <input
-        type="text"
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
-        maxLength={6}
-        placeholder="Enter OTP"
-      />
-      <p>⏳ Time remaining: {timer}s</p>
-      <button onClick={onVerify} className='verify-btn'>Verify OTP</button>
-      {timer === 0 && (
-        <button className="resend-btn" onClick={onResend}>
-          Resend OTP
-        </button>
-      )}
+
+const OTPModal = ({ captcha, otp, timer, onVerify, onResend, onClose, loading }) => {
+  return (
+    <div className="otp-overlay">
+      <div className="otp-modal">
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            <h2>OTP Verification</h2>
+            <button className="otp-close" onClick={onClose}>×</button>
+            <p>Please enter the OTP sent to your registered number.</p>
+            <div className="otp-inputs">
+              <input type="text" value={captcha} readOnly />
+              <input type="text" value={otp} readOnly />
+            </div>
+            <div className="otp-timer">
+              ⏳ {`1:${timer < 10 ? `0${timer}` : timer}`}
+            </div>
+            <div className="otp-actions">
+              <button
+                className="otp-submit"
+                onClick={() => {
+                  toast.success("OTP Submitted");
+                  toast.success("Login Successfully");
+                  onVerify();
+                }}
+              >
+                Submit
+              </button>
+              <button
+                className="otp-resend"
+                onClick={onResend}
+                disabled={timer > 0}
+                style={{
+                  opacity: timer > 0 ? 0.6 : 1,
+                  cursor: timer > 0 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Resend OTP
+              </button>
+
+            </div>
+
+          </>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default OTPModal;
