@@ -1,3 +1,4 @@
+// src/redux/Vendors/vendorSaga.js
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import axios from 'axios';
 import {
@@ -8,73 +9,86 @@ import {
   fetchCitiesSuccess,
   fetchCurrenciesSuccess,
   createVendorSuccess,
-  createVendorFailure
-} from './vendorSlice';
-
-import {
-  fetchVendorsByStatus,
+  createVendorFailure,
+  createVendorRequest,
   fetchCountries,
   fetchCities,
-  fetchCurrencies,
-  createVendor
-} from './vendorActions';
+  fetchCurrencies
+} from './vendorSlice';
 
-// Default vendor fetch
-function* fetchVendorsSaga() {
+function getAuthHeaders() {
+  const token = localStorage.getItem('authToken');
+  return {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  };
+}
+
+function* fetchVendorsSaga(action) {
   try {
-    const res = yield call(axios.post, 'https://hastin-container.com/staging/api/vendor/search/active');
+    const status = action.payload?.status || 'active';
+    const res = yield call(
+      axios.post,
+      `https://hastin-container.com/staging/api/vendor/search/${status}`,
+      {},
+      getAuthHeaders()
+    );
     yield put(fetchVendorsSuccess(res.data.data));
   } catch (error) {
     yield put(fetchVendorsFailure(error.message));
   }
 }
 
-// Fetch vendors based on status
-function* fetchVendorsByStatusSaga(action) {
-  try {
-    const res = yield call(axios.put, `https://hastin-container.com/staging/api/vendor/${action.payload.status}`);
-    yield put(fetchVendorsSuccess(res.data.data));
-  } catch (error) {
-    yield put(fetchVendorsFailure(error.message));
-  }
-}
-
-// Fetch country list
 function* fetchCountriesSaga() {
   try {
-    const res = yield call(axios.get, 'https://hastin-container.com/staging/api/meta/country');
+    const res = yield call(
+      axios.get,
+      'https://hastin-container.com/staging/api/meta/country',
+      getAuthHeaders()
+    );
     yield put(fetchCountriesSuccess(res.data.data));
   } catch (error) {
     console.error(error);
   }
 }
 
-// Fetch city list by country
 function* fetchCitiesSaga(action) {
   try {
-    const res = yield call(axios.post, 'https://hastin-container.com/staging/api/countryCities/get', {
-      country: action.payload
-    });
+    const res = yield call(
+      axios.post,
+      'https://hastin-container.com/staging/api/countryCities/get',
+      { country: action.payload },
+      getAuthHeaders()
+    );
     yield put(fetchCitiesSuccess(res.data.data));
   } catch (error) {
     console.error(error);
   }
 }
 
-// Fetch currencies
 function* fetchCurrenciesSaga() {
   try {
-    const res = yield call(axios.get, 'https://hastin-container.com/staging/api/meta/currencies');
+    const res = yield call(
+      axios.get,
+      'https://hastin-container.com/staging/api/meta/currencies',
+      getAuthHeaders()
+    );
     yield put(fetchCurrenciesSuccess(res.data.data));
   } catch (error) {
     console.error(error);
   }
 }
 
-// Create new vendor
 function* createVendorSaga(action) {
   try {
-    const res = yield call(axios.post, 'https://hastin-container.com/staging/api/vendor/create', action.payload);
+    const res = yield call(
+      axios.post,
+      'https://hastin-container.com/staging/api/vendor/create',
+      action.payload,
+      getAuthHeaders()
+    );
     yield put(createVendorSuccess(res.data.data));
   } catch (error) {
     yield put(createVendorFailure(error.message));
@@ -84,10 +98,10 @@ function* createVendorSaga(action) {
 export default function* vendorSaga() {
   yield all([
     takeLatest(fetchVendors.type, fetchVendorsSaga),
-    takeLatest(fetchVendorsByStatus.type, fetchVendorsByStatusSaga),
     takeLatest(fetchCountries.type, fetchCountriesSaga),
     takeLatest(fetchCities.type, fetchCitiesSaga),
     takeLatest(fetchCurrencies.type, fetchCurrenciesSaga),
-    takeLatest(createVendor.type, createVendorSaga),
+    takeLatest(createVendorRequest.type, createVendorSaga),
+
   ]);
 }

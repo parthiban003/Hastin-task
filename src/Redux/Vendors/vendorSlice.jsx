@@ -1,84 +1,62 @@
-// src/redux/vendor/vendorSlice.js
+// src/redux/Vendors/vendorSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-
-const initialState = {
-  vendors: [],
-  countries: [],
-  currencies: [],
-  cities: [],
-  selectedVendor: null,
-  loading: false,
-  error: null,
-};
 
 const vendorSlice = createSlice({
   name: 'vendor',
-  initialState,
+  initialState: {
+    vendors: [],
+    status: 'idle',
+    error: null,
+    countries: [],
+    currencies: [],
+    cities: [],
+    selectedVendor: null,
+  },
   reducers: {
-    // Vendor list
-    fetchVendors: (state) => {
-      state.loading = true;
+    fetchVendors: (state, action) => {
+      state.status = 'loading';
     },
     fetchVendorsSuccess: (state, action) => {
+      state.status = 'succeeded';
       state.vendors = action.payload;
-      state.loading = false;
     },
     fetchVendorsFailure: (state, action) => {
+      state.status = 'failed';
       state.error = action.payload;
-      state.loading = false;
     },
 
-    // Country list
-    fetchCountries: (state) => {
-      state.loading = true;
-    },
+    fetchCountries: () => {},
     fetchCountriesSuccess: (state, action) => {
       state.countries = action.payload;
-      state.loading = false;
     },
 
-    // Currency list
-    fetchCurrencies: (state) => {
-      state.loading = true;
-    },
+    fetchCurrencies: () => {},
     fetchCurrenciesSuccess: (state, action) => {
       state.currencies = action.payload;
-      state.loading = false;
     },
 
-    // City list
-    fetchCities: (state) => {
-      state.loading = true;
-    },
+    fetchCities: (state, action) => {},
     fetchCitiesSuccess: (state, action) => {
       state.cities = action.payload;
-      state.loading = false;
     },
 
-    // Select vendor for editing
+    createVendorRequest: () => {},
+    createVendorSuccess: (state, action) => {
+      state.vendors.push(action.payload);
+    },
+    createVendorFailure: (state, action) => {
+      state.error = action.payload;
+    },
+
     selectVendor: (state, action) => {
       state.selectedVendor = action.payload;
     },
     clearSelectedVendor: (state) => {
       state.selectedVendor = null;
     },
-
-    // Create vendor
-    createVendorRequest: (state) => {
-      state.loading = true;
-    },
-    createVendorSuccess: (state, action) => {
-      state.vendors.push(action.payload);
-      state.loading = false;
-    },
-    createVendorFailure: (state, action) => {
-      state.error = action.payload;
-      state.loading = false;
-    },
   },
 });
 
-// Export actions
 export const {
   fetchVendors,
   fetchVendorsSuccess,
@@ -93,7 +71,7 @@ export const {
   createVendorSuccess,
   createVendorFailure,
   selectVendor,
-  clearSelectedVendor
+  clearSelectedVendor,
 } = vendorSlice.actions;
 
 export default vendorSlice.reducer;

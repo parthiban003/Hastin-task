@@ -55,16 +55,18 @@ const LoginPage = () => {
     );
 
     if (res.status === 200) {
-      toast.success('OTP sent successfully!');
+      // ✅ Save token to localStorage here
+      localStorage.setItem('authToken', res.data.data.token);
 
+      toast.success('OTP sent successfully!');
       setTimeout(() => {
         setOtp(randomNumber().toString());
         setCaptcha(generateCaptcha());
-        setIsLoading(false);           
-        setShowOTPModal(true);        
+        setIsLoading(false);
+        setShowOTPModal(true);
         setIsOTPTimerActive(true);
         setTimer(60);
-      }, 2000); 
+      }, 2000);
     }
   } catch (err) {
     console.error(err);
@@ -72,6 +74,7 @@ const LoginPage = () => {
     toast.error('Invalid Name or Password.');
   }
 };
+
 
 
   const handleOTPSubmit = () => {
