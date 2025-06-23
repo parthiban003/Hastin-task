@@ -121,7 +121,7 @@ img{
 
 .login-right input[type="text"]:focus,
 .login-right input[type="password"]:focus {
-  border-color: #f33628;
+  border-color: #f32617;
   box-shadow: 0 0 5px rgba(243, 54, 40, 0.4);
   background-color: #fff;
 }

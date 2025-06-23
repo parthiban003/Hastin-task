@@ -78,15 +78,21 @@ const LoginPage = () => {
 
 
   const handleOTPSubmit = () => {
-    setOtpLoading(true);
-    setTimeout(() => {
-      setOtpLoading(false);
+  setOtpLoading(true);
+  setTimeout(() => {
+    setOtpLoading(false);
+
+    const token = localStorage.getItem('authToken');
+    if (token) {
       toast.success('Login successful!');
-      localStorage.setItem('authToken', 'some-token');
       setShowOTPModal(false);
       navigate('/dashboard');
-    }, 1500);
-  };
+    } else {
+      toast.error('Missing auth token. Please login again.');
+    }
+  }, 1500);
+};
+
 
   const handleResendOTP = () => {
     setOtpLoading(true);

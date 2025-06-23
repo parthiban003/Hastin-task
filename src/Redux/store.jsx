@@ -1,22 +1,22 @@
+// src/Redux/store.js
 import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
+import vendorReducer from './Vendors/vendorSlice';
+import vendorSaga from './Vendors/vendorSaga';
 
-import authReducer from './authSlice';
-import vendorReducer from './Vendors/vendorSlice'; // ✅ adjust the path if needed
-import vendorSaga from './Vendors/vendorSaga';     // ✅ adjust the path if needed
-
-// 1. Create saga middleware
 const sagaMiddleware = createSagaMiddleware();
 
-// 2. Configure store
-export const store = configureStore({
+const store = configureStore({
   reducer: {
-    auth: authReducer,
-    vendor: vendorReducer, // ✅ added vendor reducer
+    vendor: vendorReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),
+    getDefaultMiddleware({
+      thunk: false, // disabling redux-thunk since we're using redux-saga
+      serializableCheck: false, // optional: avoid warnings from non-serializable values in actions
+    }).concat(sagaMiddleware),
 });
 
-// 3. Run saga
 sagaMiddleware.run(vendorSaga);
+
+export default store;

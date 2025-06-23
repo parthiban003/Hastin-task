@@ -2,7 +2,7 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import axios from 'axios';
 import {
-  fetchVendors,
+  fetchVendorsByStatus,
   fetchVendorsSuccess,
   fetchVendorsFailure,
   fetchCountriesSuccess,
@@ -19,18 +19,23 @@ import {
 function getAuthHeaders() {
   const token = localStorage.getItem('authToken');
   return {
+    
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-    },
+    }
+    
+    
   };
+
 }
+
 
 function* fetchVendorsSaga(action) {
   try {
     const status = action.payload?.status || 'active';
     const res = yield call(
-      axios.post,
+      axios.put,
       `https://hastin-container.com/staging/api/vendor/search/${status}`,
       {},
       getAuthHeaders()
@@ -97,11 +102,10 @@ function* createVendorSaga(action) {
 
 export default function* vendorSaga() {
   yield all([
-    takeLatest(fetchVendors.type, fetchVendorsSaga),
+    takeLatest(fetchVendorsByStatus.type, fetchVendorsSaga),
     takeLatest(fetchCountries.type, fetchCountriesSaga),
     takeLatest(fetchCities.type, fetchCitiesSaga),
     takeLatest(fetchCurrencies.type, fetchCurrenciesSaga),
     takeLatest(createVendorRequest.type, createVendorSaga),
-
   ]);
 }

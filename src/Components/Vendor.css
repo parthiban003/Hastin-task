@@ -55,16 +55,13 @@
   background: #df1313;
   color: white;
   border: none;
-  padding: 10px 14px;
+  padding: 10px 10px;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: bold;
+  margin-left: 10px;
 }
-
-.search-input {
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.form-control {
+  padding: 5px
 }
 
 .vendor-table {

@@ -12,9 +12,11 @@ const vendorSlice = createSlice({
     cities: [],
     selectedVendor: null,
   },
+
   reducers: {
-    fetchVendors: (state, action) => {
+    fetchVendorsByStatus: (state, action) => {
       state.status = 'loading';
+      
     },
     fetchVendorsSuccess: (state, action) => {
       state.status = 'succeeded';
@@ -24,22 +26,18 @@ const vendorSlice = createSlice({
       state.status = 'failed';
       state.error = action.payload;
     },
-
     fetchCountries: () => {},
     fetchCountriesSuccess: (state, action) => {
       state.countries = action.payload;
     },
-
     fetchCurrencies: () => {},
     fetchCurrenciesSuccess: (state, action) => {
       state.currencies = action.payload;
     },
-
-    fetchCities: (state, action) => {},
+    fetchCities: () => {},
     fetchCitiesSuccess: (state, action) => {
       state.cities = action.payload;
     },
-
     createVendorRequest: () => {},
     createVendorSuccess: (state, action) => {
       state.vendors.push(action.payload);
@@ -47,7 +45,6 @@ const vendorSlice = createSlice({
     createVendorFailure: (state, action) => {
       state.error = action.payload;
     },
-
     selectVendor: (state, action) => {
       state.selectedVendor = action.payload;
     },
@@ -58,7 +55,7 @@ const vendorSlice = createSlice({
 });
 
 export const {
-  fetchVendors,
+  fetchVendorsByStatus,
   fetchVendorsSuccess,
   fetchVendorsFailure,
   fetchCountries,
