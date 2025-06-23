@@ -2,7 +2,8 @@
 import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 import vendorReducer from './Vendors/vendorSlice';
-import vendorSaga from './Vendors/vendorSaga';
+import rootSaga from './rootSaga';
+// import rootSaga from './Vendors/rootSaga'; 
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -11,12 +12,9 @@ const store = configureStore({
     vendor: vendorReducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      thunk: false, // disabling redux-thunk since we're using redux-saga
-      serializableCheck: false, // optional: avoid warnings from non-serializable values in actions
-    }).concat(sagaMiddleware),
+    getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),
 });
 
-sagaMiddleware.run(vendorSaga);
+sagaMiddleware.run(rootSaga);
 
 export default store;

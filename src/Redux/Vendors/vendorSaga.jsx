@@ -2,110 +2,87 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import axios from 'axios';
 import {
-  fetchVendorsByStatus,
-  fetchVendorsSuccess,
-  fetchVendorsFailure,
-  fetchCountriesSuccess,
-  fetchCitiesSuccess,
-  fetchCurrenciesSuccess,
-  createVendorSuccess,
-  createVendorFailure,
-  createVendorRequest,
-  fetchCountries,
-  fetchCities,
-  fetchCurrencies
+  vendorUpdateRequest,
+  fetchSuccess,
+  fetchFailure,
+  fetchInactiveVendorsRequest,
+  fetchInactiveSuccess,
+  fetchInactiveFailure,
+  markInactiveRequest,
+  markActiveRequest,
 } from './vendorSlice';
 
 function getAuthHeaders() {
   const token = localStorage.getItem('authToken');
   return {
-    
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
-    }
-    
-    
+    },
   };
-
 }
 
-
-function* fetchVendorsSaga(action) {
+function* fetchActiveVendorsSaga() {
   try {
-    const status = action.payload?.status || 'active';
-    const res = yield call(
-      axios.put,
-      `https://hastin-container.com/staging/api/vendor/search/${status}`,
+    const response = yield call(
+      axios.post,
+      'https://hastin-container.com/staging/api/vendor/search/active',
       {},
       getAuthHeaders()
     );
-    yield put(fetchVendorsSuccess(res.data.data));
+    yield put(fetchSuccess(response.data.data));
   } catch (error) {
-    yield put(fetchVendorsFailure(error.message));
+    yield put(fetchFailure(error.message));
   }
 }
 
-function* fetchCountriesSaga() {
+function* fetchInactiveVendorsSaga() {
   try {
-    const res = yield call(
-      axios.get,
-      'https://hastin-container.com/staging/api/meta/country',
-      getAuthHeaders()
-    );
-    yield put(fetchCountriesSuccess(res.data.data));
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-function* fetchCitiesSaga(action) {
-  try {
-    const res = yield call(
+    const response = yield call(
       axios.post,
-      'https://hastin-container.com/staging/api/countryCities/get',
-      { country: action.payload },
+      'https://hastin-container.com/staging/api/vendor/search/inactive',
+      {},
       getAuthHeaders()
     );
-    yield put(fetchCitiesSuccess(res.data.data));
+    yield put(fetchInactiveSuccess(response.data.data));
   } catch (error) {
-    console.error(error);
+    yield put(fetchInactiveFailure(error.message));
   }
 }
 
-function* fetchCurrenciesSaga() {
+function* markInactiveSaga(action) {
   try {
-    const res = yield call(
-      axios.get,
-      'https://hastin-container.com/staging/api/meta/currencies',
+    yield call(
+      axios.put,
+      'https://hastin-container.com/staging/api/vendor/status/update',
+      { vendorId: action.payload, status: 'INACTIVE' },
       getAuthHeaders()
     );
-    yield put(fetchCurrenciesSuccess(res.data.data));
+    yield put(vendorUpdateRequest()); // refresh active list
   } catch (error) {
-    console.error(error);
+    console.error('Error marking inactive:', error.message);
   }
 }
 
-function* createVendorSaga(action) {
+function* markActiveSaga(action) {
   try {
-    const res = yield call(
-      axios.post,
-      'https://hastin-container.com/staging/api/vendor/create',
-      action.payload,
+    yield call(
+      axios.put,
+      'https://hastin-container.com/staging/api/vendor/status/update',
+      { vendorId: action.payload, status: 'ACTIVE' },
       getAuthHeaders()
     );
-    yield put(createVendorSuccess(res.data.data));
+    yield put(fetchInactiveVendorsRequest()); // refresh inactive list
   } catch (error) {
-    yield put(createVendorFailure(error.message));
+    console.error('Error marking active:', error.message);
   }
 }
 
 export default function* vendorSaga() {
   yield all([
-    takeLatest(fetchVendorsByStatus.type, fetchVendorsSaga),
-    takeLatest(fetchCountries.type, fetchCountriesSaga),
-    takeLatest(fetchCities.type, fetchCitiesSaga),
-    takeLatest(fetchCurrencies.type, fetchCurrenciesSaga),
-    takeLatest(createVendorRequest.type, createVendorSaga),
+    takeLatest(vendorUpdateRequest.type, fetchActiveVendorsSaga),
+    takeLatest(fetchInactiveVendorsRequest.type, fetchInactiveVendorsSaga),
+    takeLatest(markInactiveRequest.type, markInactiveSaga),
+    takeLatest(markActiveRequest.type, markActiveSaga),
   ]);
 }

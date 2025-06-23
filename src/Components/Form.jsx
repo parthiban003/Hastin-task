@@ -40,13 +40,17 @@ const LoginPage = () => {
   setIsLoading(true);
   try {
     const res = await axios.post(
+      
+
       'https://hastin-container.com/staging/app/auth/login',
+      
       {
         userName: form.username,
         password: form.password,
         origin: 'AGENT',
         recaptcha: ''
       },
+      
       {
         headers: {
           'Content-Type': 'application/json'
@@ -55,9 +59,7 @@ const LoginPage = () => {
     );
 
     if (res.status === 200) {
-      // ✅ Save token to localStorage here
       localStorage.setItem('authToken', res.data.data.token);
-
       toast.success('OTP sent successfully!');
       setTimeout(() => {
         setOtp(randomNumber().toString());
@@ -68,6 +70,7 @@ const LoginPage = () => {
         setTimer(60);
       }, 2000);
     }
+   
   } catch (err) {
     console.error(err);
     setIsLoading(false);
@@ -75,24 +78,15 @@ const LoginPage = () => {
   }
 };
 
-
-
-  const handleOTPSubmit = () => {
+   const handleOTPSubmit = () => {
   setOtpLoading(true);
   setTimeout(() => {
     setOtpLoading(false);
-
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      toast.success('Login successful!');
-      setShowOTPModal(false);
-      navigate('/dashboard');
-    } else {
-      toast.error('Missing auth token. Please login again.');
-    }
+    toast.success('Login successful!');
+    setShowOTPModal(false);
+    navigate('/dashboard');
   }, 1500);
 };
-
 
   const handleResendOTP = () => {
     setOtpLoading(true);

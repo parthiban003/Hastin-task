@@ -1,58 +1,104 @@
-// src/components/VendorDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchVendorsByStatus } from '../Redux/Vendors/vendorSlice';
-import './Vendor.css';
+import {
+  vendorUpdateRequest,
+  fetchInactiveVendorsRequest,
+  markInactiveRequest,
+  markActiveRequest
+} from '../Redux/Vendors/vendorSlice'; 
+import { useNavigate } from 'react-router-dom';
+import { Tooltip } from 'react-tooltip';
+import './Vendor.css'; 
 import { toast } from 'react-toastify';
+
+const ROWS_PER_PAGE = 15;
 
 const VendorDashboard = () => {
   const dispatch = useDispatch();
-  const { vendors, status, error } = useSelector((state) => state.vendor || {});
-  const [activeTab, setActiveTab] = useState('active');
-  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
-  useEffect(() => {
-  dispatch(fetchVendorsByStatus({ status: activeTab }));
-}, [dispatch, activeTab]);
-
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const filteredVendors = vendors?.filter((vendor) =>
-    vendor.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  const { vendors = [], inactiveVendors = [], loading, error } = useSelector(
+    state => state.vendor || {}
   );
 
-  const handleSwitchVendor = () => {
-    toast.success('Switched to vendors');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState('ACTIVE');
+  const [actionMenu, setActionMenu] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [confirmModal, setConfirmModal] = useState(false);
+  const [selectedVendorId, setSelectedVendorId] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
+
+  useEffect(() => {
+    if (activeTab === 'ACTIVE') {
+      dispatch(vendorUpdateRequest());
+    } else {
+      dispatch(fetchInactiveVendorsRequest());
+    }
+  }, [activeTab]);
+
+  const dataToDisplay = Array.isArray(activeTab === 'ACTIVE' ? vendors : inactiveVendors)
+    ? (activeTab === 'ACTIVE' ? vendors : inactiveVendors)
+    : [];
+
+  const filteredVendors = dataToDisplay.filter(v =>
+    v.vendorName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredVendors.length / ROWS_PER_PAGE);
+  const paginatedVendors = filteredVendors.slice(
+    (currentPage - 1) * ROWS_PER_PAGE,
+    currentPage * ROWS_PER_PAGE
+  );
+
+  const handleConfirmAction = () => {
+    if (!selectedVendorId) return;
+    if (confirmAction === 'INACTIVE') {
+      dispatch(markInactiveRequest(selectedVendorId));
+      toast.success("Marked as Inactive");
+    } else {
+      dispatch(markActiveRequest(selectedVendorId));
+      toast.success("Marked as Active");
+    }
+    setConfirmModal(false);
   };
 
   return (
-    <div className="vendor-dashboard">
+    <div className="vendor-container">
       <div className="vendor-header">
-        <h2>HASTIN</h2>
         <div className="tabs">
-          <button className={activeTab === 'active' ? 'active' : ''} onClick={() => setActiveTab('active')}>
-            ACTIVE
-          </button>
-          <button className={activeTab === 'inactive' ? 'active' : ''} onClick={() => setActiveTab('inactive')}>
-            INACTIVE
-          </button>
+          {['ACTIVE', 'INACTIVE'].map(tab => (
+            <button
+              key={tab}
+              className={`tab ${activeTab === tab ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab(tab);
+                setCurrentPage(1);
+              }}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
-        <div className="vendor-controls">
-          <input type="text" placeholder="Search..."  onChange={handleSearch} value={searchTerm} />
-          <button className="vendor-btn" onClick={handleSwitchVendor}>
-            + New Vendor
-          </button>
-        </div>
+
+        <button onClick={() => navigate('/vendorcreate')} className="btn-new">
+          + New Vendor
+        </button>
       </div>
 
-      <div className="vendor-table-wrapper">
-        {status === 'loading' ? (
-          <p>Loading...</p>
-        ) : error ? (
-          <p className="error">{error}</p>
+      <div className="vendor-toolbar">
+        <input
+          type="text"
+          placeholder="Search..."
+          className="search-input"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <div className="table-scroll">
+        {loading ? (
+          <div className="status-msg">Loading...</div>
         ) : (
           <table className="vendor-table">
             <thead>
@@ -68,25 +114,91 @@ const VendorDashboard = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredVendors.map((vendor, index) => (
-                <tr key={vendor.id}>
-                  <td>{index + 1}</td>
-                  <td>{vendor.name}</td>
-                  <td>{vendor.vendorCode}</td>
-                  <td>{vendor.vendorType}</td>
-                  <td>{vendor.address}</td>
-                  <td>{vendor.country}</td>
-                  <td>
-                    <span className={`status ${vendor.status.toLowerCase()}`}>{vendor.status}</span>
-                  </td>
-                  <td>
-                    <button className="action-btn">⋮</button>
-                  </td>
+              {filteredVendors.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="no-data">No vendors found.</td>
                 </tr>
-              ))}
+              ) : (
+                paginatedVendors.map((vendor, index) => (
+                  <tr key={vendor.id}>
+                    <td>{(currentPage - 1) * ROWS_PER_PAGE + index + 1}</td>
+                    <td>{vendor.vendorName}</td>
+                    <td>{vendor.vendorCode}</td>
+                    <td>{vendor.vendorType}</td>
+                    <td>{vendor.dispAddress}</td>
+                    <td>{vendor.country}</td>
+                    <td>
+                      <span className={`badge badge-${vendor.status?.toLowerCase()}`}>
+                        {vendor.status}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="btn-action"
+                        onClick={() => {
+                          setActionMenu(prev => prev === vendor.id ? null : vendor.id);
+                        }}
+                      >
+                        &#8942;
+                      </button>
+                      {actionMenu === vendor.id && (
+                        <div className="action-dropdown">
+                          <button
+                            className="dropdown-btn"
+                            onClick={() => navigate(`/vendoredit/${vendor.id}`)}
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            className="dropdown-btn"
+                            onClick={() => {
+                              setSelectedVendorId(vendor.id);
+                              setConfirmAction(vendor.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE');
+                              setConfirmModal(true);
+                              setActionMenu(null);
+                            }}
+                          >
+                            {vendor.status === 'ACTIVE' ? ' Mark Inactive' : 'Mark Active'}
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         )}
+      </div>
+
+      {confirmModal && (
+        <div className="modalcon-overlay">
+          <div className="modalcon">
+            <h5>Are you sure to mark as {confirmAction}?</h5>
+            <div className="modalcon-buttons">
+              <button className="button-confirm" onClick={handleConfirmAction}>Yes</button>
+              <button className="button-cancel" onClick={() => setConfirmModal(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="pagination">
+        <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
+          &lt;
+        </button>
+        {[...Array(totalPages)].map((_, i) => (
+          <button
+            key={i + 1}
+            className={i + 1 === currentPage ? 'active' : ''}
+            onClick={() => setCurrentPage(i + 1)}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>
+          &gt;
+        </button>
       </div>
     </div>
   );

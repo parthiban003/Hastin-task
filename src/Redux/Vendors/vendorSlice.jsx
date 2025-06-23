@@ -1,74 +1,53 @@
 // src/redux/Vendors/vendorSlice.js
 import { createSlice } from '@reduxjs/toolkit';
 
+const initialState = {
+  vendors: [],
+  inactiveVendors: [],
+  loading: false,
+  error: null,
+};
+
 const vendorSlice = createSlice({
   name: 'vendor',
-  initialState: {
-    vendors: [],
-    status: 'idle',
-    error: null,
-    countries: [],
-    currencies: [],
-    cities: [],
-    selectedVendor: null,
-  },
-
+  initialState,
   reducers: {
-    fetchVendorsByStatus: (state, action) => {
-      state.status = 'loading';
-      
+    vendorUpdateRequest: (state) => {
+      state.loading = true;
     },
-    fetchVendorsSuccess: (state, action) => {
-      state.status = 'succeeded';
+    fetchSuccess: (state, action) => {
       state.vendors = action.payload;
+      state.loading = false;
     },
-    fetchVendorsFailure: (state, action) => {
-      state.status = 'failed';
+    fetchFailure: (state, action) => {
       state.error = action.payload;
+      state.loading = false;
     },
-    fetchCountries: () => {},
-    fetchCountriesSuccess: (state, action) => {
-      state.countries = action.payload;
+    fetchInactiveVendorsRequest: (state) => {
+      state.loading = true;
     },
-    fetchCurrencies: () => {},
-    fetchCurrenciesSuccess: (state, action) => {
-      state.currencies = action.payload;
+    fetchInactiveSuccess: (state, action) => {
+      state.inactiveVendors = action.payload;
+      state.loading = false;
     },
-    fetchCities: () => {},
-    fetchCitiesSuccess: (state, action) => {
-      state.cities = action.payload;
-    },
-    createVendorRequest: () => {},
-    createVendorSuccess: (state, action) => {
-      state.vendors.push(action.payload);
-    },
-    createVendorFailure: (state, action) => {
+    fetchInactiveFailure: (state, action) => {
       state.error = action.payload;
+      state.loading = false;
     },
-    selectVendor: (state, action) => {
-      state.selectedVendor = action.payload;
-    },
-    clearSelectedVendor: (state) => {
-      state.selectedVendor = null;
-    },
+    markInactiveRequest: () => {},
+    markActiveRequest: () => {},
   },
 });
 
 export const {
-  fetchVendorsByStatus,
-  fetchVendorsSuccess,
-  fetchVendorsFailure,
-  fetchCountries,
-  fetchCountriesSuccess,
-  fetchCurrencies,
-  fetchCurrenciesSuccess,
-  fetchCities,
-  fetchCitiesSuccess,
-  createVendorRequest,
-  createVendorSuccess,
-  createVendorFailure,
-  selectVendor,
-  clearSelectedVendor,
+  vendorUpdateRequest,
+  fetchSuccess,
+  fetchFailure,
+  fetchInactiveVendorsRequest,
+  fetchInactiveSuccess,
+  fetchInactiveFailure,
+  markInactiveRequest,
+  markActiveRequest,
 } = vendorSlice.actions;
 
 export default vendorSlice.reducer;
