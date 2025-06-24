@@ -40,8 +40,6 @@ const LoginPage = () => {
   setIsLoading(true);
   try {
     const res = await axios.post(
-      
-
       'https://hastin-container.com/staging/app/auth/login',
       
       {
@@ -59,7 +57,7 @@ const LoginPage = () => {
     );
 
     if (res.status === 200) {
-      localStorage.setItem('authToken', res.data.data.token);
+      localStorage.setItem('authToken', res.data.jwt);
       toast.success('OTP sent successfully!');
       setTimeout(() => {
         setOtp(randomNumber().toString());

@@ -14,24 +14,29 @@ import {
 
 function getAuthHeaders() {
   const token = localStorage.getItem('authToken');
+  if (!token){
+    console.warn("No authToken found")
+  }
   return {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYnJhaW4iLCJzY29wZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlzcyI6Imh0dHA6Ly9lYnJhaW50ZWNobm9sb2dpZXMuY29tIiwiaWF0IjoxNzUwNzY2MzcyLCJleHAiOjE3NTA3ODQzNzJ9.HWls-MBuCzXVD0T2Etj4muO-qiTRgf6WYBZtVYH5CAs`
     },
   };
 }
 
-function* fetchActiveVendorsSaga() {
+function* fetchActiveVendorsSaga(action) {
   try {
     const response = yield call(
-      axios.post,
+      axios.put,
       'https://hastin-container.com/staging/api/vendor/search/active',
-      {},
-      getAuthHeaders()
+      {}, 
+      getAuthHeaders() 
     );
-    yield put(fetchSuccess(response.data.data));
+    console.log("Fetched vendors:", response.data);
+    yield put(fetchSuccess(response.data.data)); // 
   } catch (error) {
+    console.error("Fetch vendors error:", error);
     yield put(fetchFailure(error.message));
   }
 }
@@ -39,7 +44,7 @@ function* fetchActiveVendorsSaga() {
 function* fetchInactiveVendorsSaga() {
   try {
     const response = yield call(
-      axios.post,
+      axios.put,
       'https://hastin-container.com/staging/api/vendor/search/inactive',
       {},
       getAuthHeaders()
@@ -58,7 +63,7 @@ function* markInactiveSaga(action) {
       { vendorId: action.payload, status: 'INACTIVE' },
       getAuthHeaders()
     );
-    yield put(vendorUpdateRequest()); // refresh active list
+    yield put(vendorUpdateRequest()); 
   } catch (error) {
     console.error('Error marking inactive:', error.message);
   }
@@ -72,7 +77,7 @@ function* markActiveSaga(action) {
       { vendorId: action.payload, status: 'ACTIVE' },
       getAuthHeaders()
     );
-    yield put(fetchInactiveVendorsRequest()); // refresh inactive list
+    yield put(fetchInactiveVendorsRequest()); 
   } catch (error) {
     console.error('Error marking active:', error.message);
   }

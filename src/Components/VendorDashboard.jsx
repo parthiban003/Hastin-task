@@ -5,11 +5,14 @@ import {
   fetchInactiveVendorsRequest,
   markInactiveRequest,
   markActiveRequest
-} from '../Redux/Vendors/vendorSlice'; 
+} from '../Redux/Vendors/vendorSlice';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
-import './Vendor.css'; 
+import './Vendor.css';
 import { toast } from 'react-toastify';
+import { Dropdown } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 const ROWS_PER_PAGE = 15;
 
@@ -63,8 +66,24 @@ const VendorDashboard = () => {
     setConfirmModal(false);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate('/');
+  };
+
   return (
     <div className="vendor-container">
+      <div className="topbar-wrapper">
+        <Dropdown align="end">
+          <Dropdown.Toggle variant="light" className="icon-toggle">
+            <FontAwesomeIcon icon={faUserCircle} size="lg" />
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </div>
+
       <div className="vendor-header">
         <div className="tabs">
           {['ACTIVE', 'INACTIVE'].map(tab => (
@@ -89,7 +108,7 @@ const VendorDashboard = () => {
       <div className="vendor-toolbar">
         <input
           type="text"
-          placeholder="Search..."
+          placeholder="Search"
           className="search-input"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
@@ -147,7 +166,7 @@ const VendorDashboard = () => {
                             className="dropdown-btn"
                             onClick={() => navigate(`/vendoredit/${vendor.id}`)}
                           >
-                            ✏️ Edit
+                            Edit
                           </button>
                           <button
                             className="dropdown-btn"
