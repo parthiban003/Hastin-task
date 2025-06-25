@@ -5,7 +5,7 @@ import {
   fetchInactiveVendorsRequest,
   markInactiveRequest,
   markActiveRequest
-} from '../Redux/Vendors/vendorSlice';
+} from '../Redux/Vendors/vendorActions';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import './Vendor.css';
@@ -79,7 +79,7 @@ const VendorDashboard = () => {
             <FontAwesomeIcon icon={faUserCircle} size="lg" />
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item onClick={handleLogout}>Logout</Dropdown.Item>
+            <Dropdown.Item onClick={handleLogout} className='logout-btn'>Logout</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
       </div>
@@ -173,6 +173,7 @@ const VendorDashboard = () => {
                             onClick={() => {
                               setSelectedVendorId(vendor.id);
                               setConfirmAction(vendor.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE');
+                              toast.success('Successfully fetched to Vendor')
                               setConfirmModal(true);
                               setActionMenu(null);
                             }}

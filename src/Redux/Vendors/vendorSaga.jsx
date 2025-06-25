@@ -1,52 +1,52 @@
-// src/redux/Vendors/vendorSaga.js
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import axios from 'axios';
+import * as types from './vendorTypes';
+
 import {
-  vendorUpdateRequest,
   fetchSuccess,
   fetchFailure,
-  fetchInactiveVendorsRequest,
   fetchInactiveSuccess,
   fetchInactiveFailure,
-  markInactiveRequest,
-  markActiveRequest,
-} from './vendorSlice';
+  vendorUpdateRequest,
+  fetchInactiveVendorsRequest
+} from './vendorActions';
 
 function getAuthHeaders() {
   const token = localStorage.getItem('authToken');
-  if (!token){
-    console.warn("No authToken found")
-  }
   return {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYnJhaW4iLCJzY29wZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlzcyI6Imh0dHA6Ly9lYnJhaW50ZWNobm9sb2dpZXMuY29tIiwiaWF0IjoxNzUwNzY2MzcyLCJleHAiOjE3NTA3ODQzNzJ9.HWls-MBuCzXVD0T2Etj4muO-qiTRgf6WYBZtVYH5CAs`
+      Authorization: `BslogiKey ${token}`,
     },
   };
 }
 
-function* fetchActiveVendorsSaga(action) {
+function* fetchActiveVendorsSaga() {
   try {
+    const payload = {
+      pagination: { index: 1, rowCount: -1, searchObj: null, sortingObj: null }
+    };
     const response = yield call(
       axios.put,
       'https://hastin-container.com/staging/api/vendor/search/active',
-      {}, 
-      getAuthHeaders() 
+       payload,
+      getAuthHeaders()
     );
-    console.log("Fetched vendors:", response.data);
-    yield put(fetchSuccess(response.data.data)); // 
+    yield put(fetchSuccess(response.data.data));
   } catch (error) {
-    console.error("Fetch vendors error:", error);
     yield put(fetchFailure(error.message));
   }
 }
 
 function* fetchInactiveVendorsSaga() {
   try {
+    const payload = {
+      pagination: { index: 1, rowCount: -1, searchObj: null, sortingObj: null }
+    };
     const response = yield call(
       axios.put,
       'https://hastin-container.com/staging/api/vendor/search/inactive',
-      {},
+        payload,
       getAuthHeaders()
     );
     yield put(fetchInactiveSuccess(response.data.data));
@@ -63,7 +63,7 @@ function* markInactiveSaga(action) {
       { vendorId: action.payload, status: 'INACTIVE' },
       getAuthHeaders()
     );
-    yield put(vendorUpdateRequest()); 
+    yield put(vendorUpdateRequest());
   } catch (error) {
     console.error('Error marking inactive:', error.message);
   }
@@ -77,7 +77,7 @@ function* markActiveSaga(action) {
       { vendorId: action.payload, status: 'ACTIVE' },
       getAuthHeaders()
     );
-    yield put(fetchInactiveVendorsRequest()); 
+    yield put(fetchInactiveVendorsRequest());
   } catch (error) {
     console.error('Error marking active:', error.message);
   }
@@ -85,9 +85,9 @@ function* markActiveSaga(action) {
 
 export default function* vendorSaga() {
   yield all([
-    takeLatest(vendorUpdateRequest.type, fetchActiveVendorsSaga),
-    takeLatest(fetchInactiveVendorsRequest.type, fetchInactiveVendorsSaga),
-    takeLatest(markInactiveRequest.type, markInactiveSaga),
-    takeLatest(markActiveRequest.type, markActiveSaga),
+    takeLatest(types.VENDOR_UPDATE_REQUEST, fetchActiveVendorsSaga),
+    takeLatest(types.FETCH_INACTIVE_REQUEST, fetchInactiveVendorsSaga),
+    takeLatest(types.MARK_INACTIVE_REQUEST, markInactiveSaga),
+    takeLatest(types.MARK_ACTIVE_REQUEST, markActiveSaga),
   ]);
 }

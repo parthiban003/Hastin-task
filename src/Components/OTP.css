@@ -67,7 +67,7 @@
 
 .otp-submit {
   padding: 8px 16px;
-  background-color: #6c63ff;
+  background-color: red;
   color: white;
   border: none;
   border-radius: 6px;
@@ -77,8 +77,8 @@
 .otp-resend {
   padding: 8px 16px;
   background-color: white;
-  border: 1px solid #6c63ff;
-  color: #6c63ff;
+  border: 1px solid red;
+  color: red;
   border-radius: 6px;
   cursor: pointer;
 }

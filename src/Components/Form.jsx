@@ -36,7 +36,8 @@ const LoginPage = () => {
   };
 
   const handleLogin = async (e) => {
-  e.preventDefault();
+    const token = ('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlYnJhaW4iLCJzY29wZXMiOlt7ImF1dGhvcml0eSI6IlJPTEVfQURNSU4ifV0sImlzcyI6Imh0dHA6Ly9lYnJhaW50ZWNobm9sb2dpZXMuY29tIiwiaWF0IjoxNzUwNzU0NzkxLCJleHAiOjE3NTA3NzI3OTF9.viAJ_HyMldRCgsfuVmOp_MYEKh_zue5oZeHCU3aM_ow')
+      e.preventDefault();
   setIsLoading(true);
   try {
     const res = await axios.post(
@@ -51,7 +52,8 @@ const LoginPage = () => {
       
       {
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          Authorization: `BslogiKey ${token}`,
         }
       }
     );
