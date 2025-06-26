@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faCircle } from '@fortawesome/free-solid-svg-icons';
 
 const ROWS_PER_PAGE = 15;
 
@@ -70,10 +71,23 @@ const VendorDashboard = () => {
     localStorage.clear();
     navigate('/');
   };
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.btn-action') && !event.target.closest('.action-dropdown')) {
+        setActionMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
 
   return (
     <div className="vendor-container">
       <div className="topbar-wrapper">
+        <h2>HASTIN</h2>
         <Dropdown align="end">
           <Dropdown.Toggle variant="light" className="icon-toggle">
             <FontAwesomeIcon icon={faUserCircle} size="lg" />
@@ -144,18 +158,20 @@ const VendorDashboard = () => {
                     <td>{vendor.vendorName}</td>
                     <td>{vendor.vendorCode}</td>
                     <td>{vendor.vendorType}</td>
-                    <td>{vendor.dispAddress}</td>
+                    <td title={vendor.dispAddress} style={{ maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {vendor.dispAddress}
+                    </td>
                     <td>{vendor.country}</td>
                     <td>
                       <span className={`badge badge-${vendor.status?.toLowerCase()}`}>
                         {vendor.status}
                       </span>
                     </td>
-                    <td>
+                    <td style={{ position: 'relative' }}>
                       <button
                         className="btn-action"
                         onClick={() => {
-                          setActionMenu(prev => prev === vendor.id ? null : vendor.id);
+                          setActionMenu(actionMenu === vendor.id ? null : vendor.id); 
                         }}
                       >
                         &#8942;
@@ -163,26 +179,31 @@ const VendorDashboard = () => {
                       {actionMenu === vendor.id && (
                         <div className="action-dropdown">
                           <button
-                            className="dropdown-btn"
-                            onClick={() => navigate(`/vendoredit/${vendor.id}`)}
+                            className="dropdown-btn edit-btn"
+                            onClick={() => {
+                              navigate(`/vendoredit/${vendor.id}`);
+                              toast.info("Navigating to edit vendor...");
+                              setActionMenu(null);
+                            }}
+
                           >
-                            Edit
+                            <FontAwesomeIcon icon={faEdit} /> Edit
                           </button>
                           <button
-                            className="dropdown-btn"
+                            className="dropdown-btn inactive-btn"
                             onClick={() => {
                               setSelectedVendorId(vendor.id);
                               setConfirmAction(vendor.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE');
-                              toast.success('Successfully fetched to Vendor')
                               setConfirmModal(true);
                               setActionMenu(null);
                             }}
                           >
-                            {vendor.status === 'ACTIVE' ? ' Mark Inactive' : 'Mark Active'}
+                            <FontAwesomeIcon icon={faCircle} color="red" /> {vendor.status === 'ACTIVE' ? 'Mark Inactive' : 'Mark Active'}
                           </button>
                         </div>
                       )}
                     </td>
+
                   </tr>
                 ))
               )}

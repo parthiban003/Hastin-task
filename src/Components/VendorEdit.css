@@ -1,0 +1,172 @@
+.edit-vendor-container {
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.edit-vendor-container h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #2b3674;
+  margin-bottom: 2rem;
+}
+
+.edit-vendor-form {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.card-section {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-width: 360px;
+}
+
+.card-section h5 {
+  font-size: 18px;
+  font-weight: 500;
+  color: #2b3674;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.card-section .form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.card-section label {
+  font-size: 14px;
+  margin-bottom: 0.3rem;
+  color: #555;
+}
+
+.card-section input,
+.card-section select {
+  padding: 0.6rem 0.8rem;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.card-section input:focus,
+.card-section select:focus {
+  border-color: #4a6cf7;
+}
+
+.edit-btn-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.btn-back,
+.btn-submit {
+  padding: 0.6rem 1.2rem;
+  font-size: 15px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-back {
+  background-color: #4a6cf7;
+  color: #f0eded;
+  margin-top: 2%;
+}
+
+.btn-back:hover {
+  background-color: #2149a0;
+}
+
+.btn-submit {
+  background-color: #4a6cf7;
+  color: white;
+  margin-right: 2%;
+}
+
+.btn-submit:hover {
+  background-color: #2149a0;
+}
+.react-select-container {
+  font-size: 14px;
+}
+
+.react-select__control {
+  border-radius: 6px;
+  border-color: #ccc;
+  padding: 1px;
+}
+
+.react-select__menu {
+  z-index: 1000;
+}
+.contact-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+.contact-table th, .contact-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+.contact-table input, .contact-table select {
+  width: 100%;
+  outline: none;
+}
+.btn-add {
+  background-color: #6366f1;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.btn-save {
+  background-color: #4caf50; 
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-right: 6px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-save:hover {
+  background-color: #45a049;
+}
+
+.btn-delete {
+  background-color: #f44336; 
+  border: none;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-delete:hover {
+  background-color: #d32f2f;
+}
+
+@media (max-width: 768px) {
+  .edit-vendor-form {
+    flex-direction: column;
+  }
+}
