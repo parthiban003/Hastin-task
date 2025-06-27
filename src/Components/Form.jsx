@@ -36,56 +36,56 @@ const LoginPage = () => {
   };
 
   const handleLogin = async (e) => {
-   
-      e.preventDefault();
-  setIsLoading(true);
-  try {
-    const res = await axios.post(
-      'https://hastin-container.com/staging/app/auth/login',
-      
-      {
-        userName: form.username,
-        password: form.password,
-        origin: 'AGENT',
-        recaptcha: ''
-      },
-      
-      {
-        headers: {
-          'Content-Type': 'application/json',
+
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const res = await axios.post(
+        'https://hastin-container.com/staging/app/auth/login',
+
+        {
+          userName: form.username,
+          password: form.password,
+          origin: 'AGENT',
+          recaptcha: ''
+        },
+
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          }
         }
+      );
+
+      if (res.status === 200) {
+        localStorage.setItem('authToken', res.data.data.jwt);
+        setTimeout(() => {
+          setOtp(randomNumber().toString());
+          setCaptcha(generateCaptcha());
+          setIsLoading(false);
+          setShowOTPModal(true);
+          setIsOTPTimerActive(true);
+          setTimer(60);
+          toast.success('OTP sent successfully!');
+        }, 2000);
       }
-    );
 
-    if (res.status === 200) {
-      localStorage.setItem('authToken', res.data.data.jwt);
-      setTimeout(() => {
-        setOtp(randomNumber().toString());
-        setCaptcha(generateCaptcha());
-        setIsLoading(false);
-        setShowOTPModal(true);
-        setIsOTPTimerActive(true);
-        setTimer(60);
-        toast.success('OTP sent successfully!');
-      }, 2000);
+    } catch (err) {
+      console.error(err);
+      setIsLoading(false);
+      toast.error('Invalid Name or Password.');
     }
-   
-  } catch (err) {
-    console.error(err);
-    setIsLoading(false);
-    toast.error('Invalid Name or Password.');
-  }
-};
+  };
 
-   const handleOTPSubmit = () => {
-  setOtpLoading(true);
-  setTimeout(() => {
-    setOtpLoading(false);
-    toast.success('Login successful!');
-    setShowOTPModal(false);
-    navigate('/dashboard');
-  }, 1500);
-};
+  const handleOTPSubmit = () => {
+    setOtpLoading(true);
+    setTimeout(() => {
+      setOtpLoading(false);
+      toast.success('Login successful!');
+      setShowOTPModal(false);
+      navigate('/dashboard');
+    }, 1500);
+  };
 
   const handleResendOTP = () => {
     setOtpLoading(true);

@@ -1,7 +1,7 @@
 .edit-vendor-container {
   padding: 2rem;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f9f9f9;
+  background-color: #f4f6f9;
   min-height: 100vh;
 }
 
@@ -22,17 +22,17 @@
   background-color: #fff;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   flex: 1;
   min-width: 360px;
 }
 
 .card-section h5 {
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 600;
   color: #2b3674;
   margin-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e0e0e0;
   padding-bottom: 0.5rem;
 }
 
@@ -45,7 +45,7 @@
 .card-section label {
   font-size: 14px;
   margin-bottom: 0.3rem;
-  color: #555;
+  color: #444;
 }
 
 .card-section input,
@@ -67,6 +67,8 @@
   display: flex;
   justify-content: space-between;
   margin-top: 2rem;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .btn-back,
@@ -83,7 +85,8 @@
 .btn-back {
   background-color: #4a6cf7;
   color: #f0eded;
-  margin-top: 2%;
+  margin-left: 1%;
+  margin-top: 3%;
 }
 
 .btn-back:hover {
@@ -93,12 +96,12 @@
 .btn-submit {
   background-color: #4a6cf7;
   color: white;
-  margin-right: 2%;
 }
 
 .btn-submit:hover {
   background-color: #2149a0;
 }
+
 .react-select-container {
   font-size: 14px;
 }
@@ -112,36 +115,58 @@
 .react-select__menu {
   z-index: 1000;
 }
+
 .contact-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
-}
-.contact-table th, .contact-table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  border-radius: 6px;
+  overflow: hidden;
 }
-.contact-table input, .contact-table select {
+
+.contact-table th,
+.contact-table td {
+  border: 1px solid #ddd;
+  padding: 10px 12px;
+  font-size: 14px;
+  text-align: left;
+}
+
+.contact-table input,
+.contact-table select {
   width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
   outline: none;
 }
+
 .btn-add {
   background-color: #6366f1;
   color: white;
-  padding: 6px 12px;
+  padding: 8px 14px;
   border: none;
   border-radius: 6px;
-  margin-top: 10px;
+  margin-top: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-add:hover {
+  background-color: #4f51d6;
 }
 
 .btn-save {
-  background-color: #4caf50; 
+  background-color: #4caf50;
   border: none;
   color: white;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   margin-right: 6px;
   transition: background-color 0.2s ease-in-out;
 }
@@ -151,13 +176,13 @@
 }
 
 .btn-delete {
-  background-color: #f44336; 
+  background-color: #f44336;
   border: none;
   color: white;
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   transition: background-color 0.2s ease-in-out;
 }
 
@@ -165,8 +190,53 @@
   background-color: #d32f2f;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .edit-vendor-form {
     flex-direction: column;
+  }
+
+  .card-section {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-table th,
+  .contact-table td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .btn-save,
+  .btn-delete {
+    font-size: 13px;
+    padding: 5px 10px;
+  }
+
+  .edit-btn-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .btn-back,
+  .btn-submit {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .edit-vendor-container {
+    padding: 1rem;
+  }
+
+  .contact-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .contact-table th,
+  .contact-table td {
+    white-space: nowrap;
   }
 }

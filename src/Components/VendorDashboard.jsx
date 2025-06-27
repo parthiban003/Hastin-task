@@ -7,13 +7,11 @@ import {
   markActiveRequest
 } from '../Redux/Vendors/vendorActions';
 import { useNavigate } from 'react-router-dom';
-import { Tooltip } from 'react-tooltip';
-import './Vendor.css';
-import { toast } from 'react-toastify';
 import { Dropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
-import { faEdit, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle, faEdit, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'react-toastify';
+import './Vendor.css';
 
 const ROWS_PER_PAGE = 15;
 
@@ -39,7 +37,7 @@ const VendorDashboard = () => {
     } else {
       dispatch(fetchInactiveVendorsRequest());
     }
-  }, [activeTab]);
+  }, [activeTab, dispatch]);
 
   const dataToDisplay = Array.isArray(activeTab === 'ACTIVE' ? vendors : inactiveVendors)
     ? (activeTab === 'ACTIVE' ? vendors : inactiveVendors)
@@ -59,10 +57,10 @@ const VendorDashboard = () => {
     if (!selectedVendorId) return;
     if (confirmAction === 'INACTIVE') {
       dispatch(markInactiveRequest(selectedVendorId));
-      toast.success("Marked as Inactive");
+      toast.success("Vendor marked as Inactive");
     } else {
       dispatch(markActiveRequest(selectedVendorId));
-      toast.success("Marked as Active");
+      toast.success("Vendor marked as Active");
     }
     setConfirmModal(false);
   };
@@ -71,21 +69,20 @@ const VendorDashboard = () => {
     localStorage.clear();
     navigate('/');
   };
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.btn-action') && !event.target.closest('.action-dropdown')) {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.btn-action') && !e.target.closest('.action-dropdown')) {
         setActionMenu(null);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
 
   return (
     <div className="vendor-container">
+      {/* Topbar */}
       <div className="topbar-wrapper">
         <h2>HASTIN</h2>
         <Dropdown align="end">
@@ -98,6 +95,7 @@ const VendorDashboard = () => {
         </Dropdown>
       </div>
 
+      {/* Tabs and New Vendor */}
       <div className="vendor-header">
         <div className="tabs">
           {['ACTIVE', 'INACTIVE'].map(tab => (
@@ -119,9 +117,12 @@ const VendorDashboard = () => {
         </button>
       </div>
 
+      {/* Search */}
       <div className="vendor-toolbar">
         <input
           type="text"
+          id='vendor-search'
+          name='search'
           placeholder="Search"
           className="search-input"
           value={searchTerm}
@@ -129,6 +130,7 @@ const VendorDashboard = () => {
         />
       </div>
 
+      {/* Vendor Table */}
       <div className="table-scroll">
         {loading ? (
           <div className="status-msg">Loading...</div>
@@ -171,7 +173,7 @@ const VendorDashboard = () => {
                       <button
                         className="btn-action"
                         onClick={() => {
-                          setActionMenu(actionMenu === vendor.id ? null : vendor.id); 
+                          setActionMenu(actionMenu === vendor.id ? null : vendor.id);
                         }}
                       >
                         &#8942;
@@ -182,10 +184,9 @@ const VendorDashboard = () => {
                             className="dropdown-btn edit-btn"
                             onClick={() => {
                               navigate(`/vendoredit/${vendor.id}`);
-                              toast.info("Navigating to edit vendor...");
+                              toast.info("Navigating to Create Vendor");
                               setActionMenu(null);
                             }}
-
                           >
                             <FontAwesomeIcon icon={faEdit} /> Edit
                           </button>
@@ -198,12 +199,12 @@ const VendorDashboard = () => {
                               setActionMenu(null);
                             }}
                           >
-                            <FontAwesomeIcon icon={faCircle} color="red" /> {vendor.status === 'ACTIVE' ? 'Mark Inactive' : 'Mark Active'}
+                            <FontAwesomeIcon icon={faCircle} color="red" />
+                            {vendor.status === 'ACTIVE' ? 'Mark Inactive' : 'Mark Active'}
                           </button>
                         </div>
                       )}
                     </td>
-
                   </tr>
                 ))
               )}
@@ -212,18 +213,20 @@ const VendorDashboard = () => {
         )}
       </div>
 
+      {/* Modal Confirm */}
       {confirmModal && (
-        <div className="modalcon-overlay">
-          <div className="modalcon">
-            <h5>Are you sure to mark as {confirmAction}?</h5>
-            <div className="modalcon-buttons">
-              <button className="button-confirm" onClick={handleConfirmAction}>Yes</button>
-              <button className="button-cancel" onClick={() => setConfirmModal(false)}>Cancel</button>
+        <div className="modal-overlay">
+          <div className="confirm-modal">
+            <p>Are you sure you want to mark this vendor as <b>{confirmAction}</b>?</p>
+            <div className="modal-buttons">
+              <button className="btn-yes" onClick={handleConfirmAction}>Yes</button>
+              <button className="btn-cancel" onClick={() => setConfirmModal(false)}>Cancel</button>
             </div>
           </div>
         </div>
       )}
 
+      {/* Pagination */}
       <div className="pagination">
         <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
           &lt;

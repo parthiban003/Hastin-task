@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-rou
 import VendorDashboard from './Components/VendorDashboard';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import VendorEdit from './Components/VendorEdit';
+import VendorCreate from './Components/VendorCreate';
 
 
 
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Form />} />
           <Route path="/dashboard" element={<VendorDashboard />} />
           <Route path="/vendoredit/:id" element={<VendorEdit />} />
+          <Route path='/vendorcreate' element={<VendorCreate />} />
         </Routes>
       
     </BrowserRouter>

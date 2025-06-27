@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import './VendorEdit.css';
+import { toast } from 'react-toastify';
 
 const VendorEdit = () => {
   const { id } = useParams();
@@ -16,7 +17,7 @@ const VendorEdit = () => {
     address1: '', address2: '', postalCode: '', country: '', city: '',
     accountName: '', accountNumber: '', bankName: '', branch: '', swiftCode: ''
   });
-
+  const [formErrors, setFormErrors] = useState({});
   const [contactErrors, setContactErrors] = useState({});
 
   useEffect(() => {
@@ -36,47 +37,69 @@ const VendorEdit = () => {
         }
       });
 
-    fetch(`https://hastin-container.com/staging/api/vendor/${id}`)
-      .then(res => res.text())
-      .then(data => {
+    const fetchVendorDetails = async () => {
+      try {
+        const token = localStorage.getItem('authToken');
+        const response = await fetch(`https://hastin-container.com/staging/api/vendor/${id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `BslogiKey ${token}`,
+          },
+        });
+
+        const data = await response.json();
         if (data?.data) {
           const v = data.data;
           setFormData({
-            vendorName: v.vendorName || '',
-            vendorCode: v.vendorCode || '',
-            vendorType: v.vendorType || '',
-            taxReg: v.taxRegistrationNo || '',
-            companyReg: v.companyRegistrationNo || '',
-            currency: v.defaultCurrency || '',
-            address1: v.address1 || '',
-            address2: v.address2 || '',
-            postalCode: v.postalCode || '',
-            country: v.country || '',
-            city: v.city || '',
-            accountName: v.accountName || '',
-            accountNumber: v.accountNumber || '',
-            bankName: v.bankName || '',
-            branch: v.branch || '',
-            swiftCode: v.swiftCode || ''
+            vendorName: v.vendorName || '', vendorCode: v.vendorCode || '', vendorType: v.vendorType || '',
+            taxReg: v.taxRegistrationNo || '', companyReg: v.companyRegistrationNo || '',
+            currency: v.defaultCurrency || '', address1: v.address1 || '', address2: v.address2 || '',
+            postalCode: v.postalCode || '', country: v.country || '', city: v.city || '',
+            accountName: v.accountName || '', accountNumber: v.accountNumber || '',
+            bankName: v.bankName || '', branch: v.branch || '', swiftCode: v.swiftCode || ''
           });
           setContacts(v.contacts || []);
         }
-      });
+      } catch (error) {
+        console.error('Error fetching vendor details:', error);
+      }
+    };
+
+    if (id) fetchVendorDetails();
   }, [id]);
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const validateForm = () => {
+    const errors = {};
+    if (!formData.vendorName) errors.vendorName = 'Vendor Name is required';
+    if (!formData.vendorCode) errors.vendorCode = 'Vendor Code is required';
+    if (!formData.vendorType) errors.vendorType = 'Vendor Type is required';
+    if (!formData.address1) errors.address1 = 'Address 1 is required';
+    if (!formData.postalCode) errors.postalCode = 'Postal Code is required';
+    if (!formData.country) errors.country = 'Country is required';
+    if (!formData.city) errors.city = 'City is required';
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = e => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     fetch(`https://hastin-container.com/staging/api/vendor/update`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, ...formData })
     })
       .then(res => res.json())
-      .then(() => navigate('/dashboard'));
+      .then(() => {
+        toast.success('Vendor updated successfully');
+        navigate('/dashboard');
+      });
   };
 
   const addContact = () => {
@@ -98,7 +121,7 @@ const VendorEdit = () => {
     if (Object.keys(errors).length) {
       setContactErrors({ [index]: errors });
       return;
-    } 
+    }
 
     const method = c.id ? 'PUT' : 'POST';
     const url = `https://hastin-container.com/staging/api/vendor/contact/${method === 'POST' ? 'create' : 'update'}`;
@@ -148,7 +171,7 @@ const VendorEdit = () => {
 
         <div className="card-section">
           <h5>Address</h5>
-          <div className="form-group"><label>Address 1</label><input value={formData.address1} onChange={e => handleChange('address1', e.target.value)} /></div>
+          <div className="form-group"><label>Address 1</label><input name='address1' value={formData.address1} onChange={e => handleChange('address1', e.target.value)} /></div>
           <div className="form-group"><label>Address 2</label><input value={formData.address2} onChange={e => handleChange('address2', e.target.value)} /></div>
           <div className="form-group"><label>Postal Code</label><input value={formData.postalCode} onChange={e => handleChange('postalCode', e.target.value)} /></div>
           <div className="form-group"><label>Country</label>

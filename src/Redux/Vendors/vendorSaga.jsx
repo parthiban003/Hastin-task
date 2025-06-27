@@ -28,7 +28,7 @@ function* fetchActiveVendorsSaga() {
     const payload = {
       pagination: { index: 1, rowCount: -1, searchObj: null, sortingObj: null },
     };
-    
+
     const config = yield call(getAuthHeaders);
     const response = yield call(
       axios.put,
@@ -46,7 +46,7 @@ function* fetchInactiveVendorsSaga() {
     const payload = {
       pagination: { index: 1, rowCount: -1, searchObj: null, sortingObj: null }
     };
-    
+
     const config = yield call(getAuthHeaders);
     const response = yield call(
       axios.put,
@@ -54,8 +54,8 @@ function* fetchInactiveVendorsSaga() {
       payload,
       config
     );
-    
-    console.log("Inactive vendors response:", response.data);
+
+    console.log("Inactive vendors response:", response.data?.data);
 
     yield put(fetchInactiveSuccess(response.data?.data?.tableData || []));
   } catch (error) {
@@ -66,7 +66,7 @@ function* fetchInactiveVendorsSaga() {
 
 function* markInactiveSaga(action) {
   try {
-      yield call(
+    yield call(
       axios.put,
       'https://hastin-container.com/staging/api/vendor/status/update',
       { vendorId: action.payload, status: 'INACTIVE' },
