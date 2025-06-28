@@ -20,7 +20,7 @@ const VendorEdit = () => {
   const [formErrors, setFormErrors] = useState({});
   const [contactErrors, setContactErrors] = useState({});
 
-  useEffect(() => {
+  useEffect(()  => {
     fetch('https://hastin-container.com/staging/api/meta/country')
       .then(res => res.json())
       .then(data => {
@@ -144,13 +144,13 @@ const VendorEdit = () => {
   };
 
   return (
-    <div className="edit-vendor-container">
+    <div className="edit-vendor-container" >
       <h2>Edit Vendor</h2>
       <form className="edit-vendor-form" onSubmit={handleSubmit}>
         <div className="card-section">
           <h5>Basic Info</h5>
-          <div className="form-group"><label>Vendor Name</label><input value={formData.vendorName} onChange={e => handleChange('vendorName', e.target.value)} /></div>
-          <div className="form-group"><label>Vendor Code</label><input value={formData.vendorCode} onChange={e => handleChange('vendorCode', e.target.value)} /></div>
+          <div className="form-group"><label>Vendor Name</label><input name='vendorname' value={formData.vendorName} onChange={e => handleChange('vendorName', e.target.value)} /></div>
+          <div className="form-group"><label>Vendor Code</label><input name='vendorcode' value={formData.vendorCode} onChange={e => handleChange('vendorCode', e.target.value)} /></div>
           <div className="form-group"><label>Vendor Type</label>
             <select value={formData.vendorType} onChange={e => handleChange('vendorType', e.target.value)}>
               <option value="">Select</option>
@@ -158,8 +158,8 @@ const VendorEdit = () => {
               <option>Individual</option>
             </select>
           </div>
-          <div className="form-group"><label>Tax Registration No</label><input value={formData.taxReg} onChange={e => handleChange('taxReg', e.target.value)} /></div>
-          <div className="form-group"><label>Company Registration No</label><input value={formData.companyReg} onChange={e => handleChange('companyReg', e.target.value)} /></div>
+          <div className="form-group"><label>Tax Registration No</label><input name='taxReg' value={formData.taxReg} onChange={e => handleChange('taxReg', e.target.value)} /></div>
+          <div className="form-group"><label>Company Registration No</label><input name='companyReg' value={formData.companyReg} onChange={e => handleChange('companyReg', e.target.value)} /></div>
           <div className="form-group"><label>Default Currency</label>
             <Select
               options={currencies}
@@ -172,8 +172,8 @@ const VendorEdit = () => {
         <div className="card-section">
           <h5>Address</h5>
           <div className="form-group"><label>Address 1</label><input name='address1' value={formData.address1} onChange={e => handleChange('address1', e.target.value)} /></div>
-          <div className="form-group"><label>Address 2</label><input value={formData.address2} onChange={e => handleChange('address2', e.target.value)} /></div>
-          <div className="form-group"><label>Postal Code</label><input value={formData.postalCode} onChange={e => handleChange('postalCode', e.target.value)} /></div>
+          <div className="form-group"><label>Address 2</label><input name='address2' value={formData.address2} onChange={e => handleChange('address2', e.target.value)} /></div>
+          <div className="form-group"><label>Postal Code</label><input name='postalcode' value={formData.postalCode} onChange={e => handleChange('postalCode', e.target.value)} /></div>
           <div className="form-group"><label>Country</label>
             <Select
               options={countries}
@@ -181,16 +181,16 @@ const VendorEdit = () => {
               onChange={opt => handleChange('country', opt.value)}
             />
           </div>
-          <div className="form-group"><label>City</label><input value={formData.city} onChange={e => handleChange('city', e.target.value)} /></div>
+          <div className="form-group"><label>City</label><input name='city' value={formData.city} onChange={e => handleChange('city', e.target.value)} /></div>
         </div>
 
         <div className="card-section">
           <h5>Bank Info</h5>
-          <div className="form-group"><label>Account Name</label><input value={formData.accountName} onChange={e => handleChange('accountName', e.target.value)} /></div>
-          <div className="form-group"><label>Account Number</label><input value={formData.accountNumber} onChange={e => handleChange('accountNumber', e.target.value)} /></div>
-          <div className="form-group"><label>Bank Name</label><input value={formData.bankName} onChange={e => handleChange('bankName', e.target.value)} /></div>
-          <div className="form-group"><label>Branch</label><input value={formData.branch} onChange={e => handleChange('branch', e.target.value)} /></div>
-          <div className="form-group"><label>SWIFT Code</label><input value={formData.swiftCode} onChange={e => handleChange('swiftCode', e.target.value)} /></div>
+          <div className="form-group"><label>Account Name</label><input name='accountname' value={formData.accountName} onChange={e => handleChange('accountName', e.target.value)} /></div>
+          <div className="form-group"><label>Account Number</label><input type='number' name='accountnumber' value={formData.accountNumber} onChange={e => handleChange('accountNumber', e.target.value)} /></div>
+          <div className="form-group"><label>Bank Name</label><input name='banknumber' value={formData.bankName} onChange={e => handleChange('bankName', e.target.value)} /></div>
+          <div className="form-group"><label>Branch</label><input name='branch' value={formData.branch} onChange={e => handleChange('branch', e.target.value)} /></div>
+          <div className="form-group"><label>SWIFT Code</label><input name='swiftcode' value={formData.swiftCode} onChange={e => handleChange('swiftCode', e.target.value)} /></div>
         </div>
 
         <div className="card-section">
@@ -204,15 +204,15 @@ const VendorEdit = () => {
                 <tr key={i}>
                   <td>{i + 1}</td>
                   <td>
-                    <input value={c.name} placeholder='Name' onChange={e => updateContact(i, 'name', e.target.value)} />
+                    <input name='name' value={c.name}  placeholder='Name' onChange={e => updateContact(i, 'name', e.target.value)} />
                     {contactErrors[i]?.name && <p className="error">{contactErrors[i].name}</p>}
                   </td>
                   <td>
-                    <input value={c.email} placeholder='E-mail' onChange={e => updateContact(i, 'email', e.target.value)} />
+                    <input value={c.email} name='email' placeholder='E-mail' onChange={e => updateContact(i, 'email', e.target.value)} />
                     {contactErrors[i]?.email && <p className="error">{contactErrors[i].email}</p>}
                   </td>
                   <td>
-                    <input value={c.phone} placeholder='Phone' onChange={e => updateContact(i, 'phone', e.target.value)} />
+                    <input value={c.phone} type='number' name='phone' placeholder='Phone' onChange={e => updateContact(i, 'phone', e.target.value)} />
                     {contactErrors[i]?.phone && <p className="error">{contactErrors[i].phone}</p>}
                   </td>
                   <td>
@@ -233,7 +233,10 @@ const VendorEdit = () => {
 
         <div className="form-actions">
           <button type="submit" className="btn-submit">Update Vendor</button>
-          <button type="button" onClick={() => navigate(-1)} className="btn-back">Back</button>
+          <button type="button" onClick={() => 
+            {navigate(-1);
+              toast.info('Fetched to Vendors Screen')
+            }} className="btn-back">Back</button>
         </div>
       </form>
     </div>

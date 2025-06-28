@@ -6,6 +6,7 @@ import VendorDashboard from './Components/VendorDashboard';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import VendorEdit from './Components/VendorEdit';
 import VendorCreate from './Components/VendorCreate';
+import { ToastContainer } from 'react-toastify';
 
 
 
@@ -19,7 +20,7 @@ function App() {
           <Route path="/vendoredit/:id" element={<VendorEdit />} />
           <Route path='/vendorcreate' element={<VendorCreate />} />
         </Routes>
-      
+      <ToastContainer position="top-right" autoClose={3000}  theme="colored"  hideProgressBar={false}/>
     </BrowserRouter>
   );
 }

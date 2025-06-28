@@ -100,7 +100,7 @@ const VendorCreate = () => {
 
       if (data?.message === "Vendor Created Successfully") {
         toast.success("Vendor created successfully!");
-        navigate('/dashboard'); 
+        navigate('/dashboard');
       } else {
         toast.error("Failed to create vendor!");
         console.log(data);
@@ -115,18 +115,77 @@ const VendorCreate = () => {
     <div className="edit-vendor-container">
       <h2>Create New Vendor</h2>
       <div className="edit-vendor-form">
+
         {/* VENDOR DETAILS */}
         <div className="card-section">
           <h5>Vendor Details</h5>
-          {['vendorName', 'vendorCode', 'vendorType', 'taxReg', 'companyReg'].map((field, idx) => (
-            <div className="form-group" key={idx}>
-              <label>{field}</label>
-              <input name={field} value={formData[field]} onChange={handleInputChange} />
-            </div>
-          ))}
+
           <div className="form-group">
-            <label>Currency</label>
-            <select name="currency" value={formData.currency} onChange={handleInputChange}>
+            <label htmlFor="vendorName">Vendor Name</label>
+            <input
+              type="text"
+              id="vendorName"
+              name="vendorName"
+              value={formData.vendorName}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="vendorCode">Vendor Code</label>
+            <input
+              type="text"
+              id="vendorCode"
+              name="vendorCode"
+              value={formData.vendorCode}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="vendorType">Vendor Type</label>
+            <select
+              id="vendorType"
+              name="vendorType"
+              value={formData.vendorType}
+              onChange={handleInputChange}
+            >
+              <option value="">Select</option>
+              <option value="Individual">Individual</option>
+              <option value="Company">Company</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="taxReg">Tax Registration</label>
+            <input
+              type="text"
+              id="taxReg"
+              name="taxReg"
+              value={formData.taxReg}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="companyReg">Company Registration</label>
+            <input
+              type="text"
+              id="companyReg"
+              name="companyReg"
+              value={formData.companyReg}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="currency">Currency</label>
+            <select
+              id="currency"
+              name="currency"
+              value={formData.currency}
+              onChange={handleInputChange}
+            >
               <option value="">Select</option>
               {currencies.map((cur, i) => (
                 <option key={i} value={cur}>{cur}</option>
@@ -135,39 +194,130 @@ const VendorCreate = () => {
           </div>
         </div>
 
+
         {/* ADDRESS DETAILS */}
         <div className="card-section">
           <h5>Address Info</h5>
-          {['address1', 'address2', 'postalCode'].map((field, idx) => (
-            <div className="form-group" key={idx}>
-              <label>{field}</label>
-              <input name={field} value={formData[field]} onChange={handleInputChange} />
-            </div>
-          ))}
+
           <div className="form-group">
-            <label>Country</label>
-            <select name="country" value={formData.country} onChange={handleInputChange}>
+            <label htmlFor="address1">Address Line 1</label>
+            <input
+              type="text"
+              id="address1"
+              name="address1"
+              value={formData.address1}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="address2">Address Line 2</label>
+            <input
+              type="text"
+              id="address2"
+              name="address2"
+              value={formData.address2}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="postalCode">Postal Code</label>
+            <input
+              type="text"
+              id="postalCode"
+              name="postalCode"
+              value={formData.postalCode}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="country">Country</label>
+            <select
+              id="country"
+              name="country"
+              value={formData.country}
+              onChange={handleInputChange}
+            >
               <option value="">Select</option>
               {countries.map((c, i) => (
                 <option key={i} value={c}>{c}</option>
               ))}
             </select>
           </div>
+
           <div className="form-group">
-            <label>City</label>
-            <input name="city" value={formData.city} onChange={handleInputChange} />
+            <label htmlFor="city">City</label>
+            <input
+              type="text"
+              id="city"
+              name="city"
+              value={formData.city}
+              onChange={handleInputChange}
+            />
           </div>
         </div>
+
 
         {/* BANK DETAILS */}
         <div className="card-section">
           <h5>Bank Info</h5>
-          {['accountName', 'accountNumber', 'bankName', 'branch', 'swiftCode'].map((field, idx) => (
-            <div className="form-group" key={idx}>
-              <label>{field}</label>
-              <input name={field} value={formData[field]} onChange={handleInputChange} />
-            </div>
-          ))}
+
+          <div className="form-group">
+            <label htmlFor="accountName">Account Name</label>
+            <input
+              type="text"
+              id="accountName"
+              name="accountName"
+              value={formData.accountName}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="accountNumber">Account Number</label>
+            <input
+              type="number"
+              id="accountNumber"
+              name="accountNumber"
+              value={formData.accountNumber}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="bankName">Bank Name</label>
+            <input
+              type="text"
+              id="bankName"
+              name="bankName"
+              value={formData.bankName}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="branch">Branch</label>
+            <input
+              type="text"
+              id="branch"
+              name="branch"
+              value={formData.branch}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="swiftCode">SWIFT Code</label>
+            <input
+              type="text"
+              id="swiftCode"
+              name="swiftCode"
+              value={formData.swiftCode}
+              onChange={handleInputChange}
+            />
+          </div>
         </div>
 
         {/* CONTACTS */}
@@ -187,7 +337,7 @@ const VendorCreate = () => {
                 <tr key={index}>
                   <td><input value={contact.name} placeholder='Name' onChange={e => handleContactChange(index, 'name', e.target.value)} /></td>
                   <td><input value={contact.email} placeholder='E-mail' onChange={e => handleContactChange(index, 'email', e.target.value)} /></td>
-                  <td><input value={contact.mobile} placeholder='Mobile' onChange={e => handleContactChange(index, 'mobile', e.target.value)} /></td>
+                  <td><input value={contact.mobile} type='number' placeholder='Phone' onChange={e => handleContactChange(index, 'mobile', e.target.value)} /></td>
                   <td>
                     {contacts.length > 1 && (
                       <button className="btn-delete" onClick={() => removeContact(index)}>Delete</button>
@@ -203,13 +353,16 @@ const VendorCreate = () => {
 
       {/* SUBMIT BUTTON */}
       <div className="edit-btn-row">
-        <button className="btn-back" style={{height:'40px'}} onClick={() => navigate('/dashboard')}>Cancel</button>
-        <button className="btn-submit" style={{padding:'10px', height:'40px', marginRight:'80%', marginTop:'3%'}} onClick={handleSubmit}>Create Vendor</button>
-        <ToastContainer position="top-right" autoClose={3000} />
+        <button className="btn-back" style={{ height: '40px' }} onClick={() => 
+          {navigate('/dashboard');
+            toast.info('Fetched to Vendors Screen')
+          }}>Cancel</button>
+        <button className="btn-submit" style={{ padding: '10px', height: '40px', marginRight: '80%', marginTop: '3%' }} onClick={handleSubmit}>Create Vendor</button>
+        
       </div>
     </div>
   );
-  
+
 };
 
 export default VendorCreate;

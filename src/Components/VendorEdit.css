@@ -122,9 +122,11 @@
   margin-bottom: 1rem;
   border: 1px solid #ddd;
   border-radius: 6px;
-  overflow: hidden;
 }
-
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button{
+	-webkit-appearance:none;
+}
 .contact-table th,
 .contact-table td {
   border: 1px solid #ddd;
@@ -132,7 +134,9 @@
   font-size: 14px;
   text-align: left;
 }
-
+.contact-table th{
+  background-color: gainsboro;
+}
 .contact-table input,
 .contact-table select {
   width: 100%;

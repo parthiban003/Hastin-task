@@ -112,7 +112,9 @@ const VendorDashboard = () => {
           ))}
         </div>
 
-        <button onClick={() => navigate('/vendorcreate')} className="btn-new">
+        <button onClick={() => {navigate('/vendorcreate');
+          toast.info('Fetched to Create Vendor')
+        }} className="btn-new">
           + New Vendor
         </button>
       </div>
@@ -184,7 +186,7 @@ const VendorDashboard = () => {
                             className="dropdown-btn edit-btn"
                             onClick={() => {
                               navigate(`/vendoredit/${vendor.id}`);
-                              toast.info("Navigating to Create Vendor");
+                              toast.info("Fetched to Edit Vendor");
                               setActionMenu(null);
                             }}
                           >
