@@ -10,6 +10,12 @@ import {
   vendorUpdateRequest,
   fetchInactiveVendorsRequest
 } from './vendorActions';
+import {
+  fetchVendorDetailsSuccess,
+  fetchVendorDetailsFailure,
+  fetchCitiesSuccess,
+  fetchCitiesFailure,
+} from './vendorSlice';
 // import { config } from '@fortawesome/fontawesome-svg-core';
 
 function getAuthHeaders() {
@@ -66,13 +72,14 @@ function* fetchInactiveVendorsSaga() {
 
 function* markInactiveSaga(action) {
   try {
-    yield call(
+    
+    const res = yield call(
       axios.put,
       'https://hastin-container.com/staging/api/vendor/status/update',
       { vendorId: action.payload, status: 'INACTIVE' },
       getAuthHeaders()
     );
-    yield put(vendorUpdateRequest());
+    yield put(vendorUpdateRequest(res.data?.data?.tableData || []));
   } catch (error) {
     console.error('Error marking inactive:', error.message);
   }
@@ -80,17 +87,49 @@ function* markInactiveSaga(action) {
 
 function* markActiveSaga(action) {
   try {
-    yield call(
+   const res = yield call(
       axios.put,
       'https://hastin-container.com/staging/api/vendor/status/update',
       { vendorId: action.payload, status: 'ACTIVE' },
       getAuthHeaders()
     );
-    yield put(fetchInactiveVendorsRequest());
+    yield put(fetchInactiveVendorsRequest(res.data?.data?.tableData || []));
   } catch (error) {
     console.error('Error marking active:', error.message);
   }
 }
+// 1. Fetch single vendor by ID (Edit screen)
+function* fetchVendorDetailsSaga(action) {
+  try {
+    const config = yield call(getAuthHeaders);
+    const response = yield call(
+      axios.post,
+      `https://hastin-container.com/staging/api/vendor/${action.payload}`,
+      {},
+      config
+    );
+    yield put(fetchVendorDetailsSuccess(response.data?.data));
+  } catch (error) {
+    yield put(fetchVendorDetailsFailure(error?.response?.data?.message || error.message));
+  }
+}
+
+// 2. Fetch cities for selected country
+function* fetchCitiesSaga(action) {
+  try {
+    const config = yield call(getAuthHeaders);
+    const response = yield call(
+      axios.post,
+      `https://hastin-container.com/staging/api/countryCities/get`,
+      { country: action.payload },
+      config
+    );
+    yield put(fetchCitiesSuccess(response.data?.data || []));
+  } catch (error) {
+    yield put(fetchCitiesFailure(error?.response?.data?.message || error.message));
+  }
+}
+
 
 export default function* vendorSaga() {
   yield all([
@@ -98,5 +137,7 @@ export default function* vendorSaga() {
     takeLatest(types.FETCH_INACTIVE_REQUEST, fetchInactiveVendorsSaga),
     takeLatest(types.MARK_INACTIVE_REQUEST, markInactiveSaga),
     takeLatest(types.MARK_ACTIVE_REQUEST, markActiveSaga),
+     takeLatest(types.FETCH_VENDOR_DETAILS_REQUEST, fetchVendorDetailsSaga),  
+    takeLatest(types.FETCH_CITIES_REQUEST, fetchCitiesSaga), 
   ]);
 }

@@ -42,6 +42,8 @@
   },
   "proxy": "https://hastin-container.com",
 
+
+
   "browserslist": {
     "production": [
       ">0.2%",

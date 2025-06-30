@@ -1,50 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
+import Select from 'react-select';
 import 'react-toastify/dist/ReactToastify.css';
 
 const VendorCreate = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    vendorName: '',
-    vendorCode: '',
-    vendorType: '',
-    taxReg: '',
-    companyReg: '',
-    currency: '',
-    address1: '',
-    address2: '',
-    postalCode: '',
-    country: '',
-    city: '',
-    accountName: '',
-    accountNumber: '',
-    bankName: '',
-    branch: '',
-    swiftCode: ''
+    vendorName: '', vendorCode: '', vendorType: '',
+    taxReg: '', companyReg: '', currency: '',
+    address1: '', address2: '', postalCode: '', country: '', city: '',
+    accountName: '', accountNumber: '', bankName: '', branch: '', swiftCode: ''
   });
 
   const [contacts, setContacts] = useState([{ name: '', email: '', mobile: '' }]);
   const [countries, setCountries] = useState([]);
   const [currencies, setCurrencies] = useState([]);
-  
+  const [cities, setCities] = useState([]);
 
   useEffect(() => {
     fetch('https://hastin-container.com/staging/api/meta/country')
       .then(res => res.json())
-      .then(data => setCountries(data?.data?.map(c => c.name) || []));
+      .then(data => setCountries(data?.data?.map(c => ({ value: c.name, label: c.name })) || []));
 
     fetch('https://hastin-container.com/staging/api/meta/currencies')
       .then(res => res.json())
-      .then(data => setCurrencies(data?.data?.map(c => c.name) || []));
+      .then(data => setCurrencies(data?.data?.map(c => ({ value: c.name, label: c.name })) || []));
   }, []);
 
+  useEffect(() => {
+    if (formData.country) {
+      fetch('/staging/api/countryCities/get', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ country: formData.country })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data?.data?.length) {
+            setCities(data.data.map(c => ({ value: c.city, label: c.city })));
+          } else {
+            setCities([]);
+          }
+        });
+    }
+  }, [formData.country]);
+
   const handleInputChange = (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleContactChange = (index, field, value) => {
@@ -115,254 +119,127 @@ const VendorCreate = () => {
     <div className="edit-vendor-container">
       <h2>Create New Vendor</h2>
       <div className="edit-vendor-form">
-
-        {/* VENDOR DETAILS */}
         <div className="card-section">
           <h5>Vendor Details</h5>
-
           <div className="form-group">
-            <label htmlFor="vendorName">Vendor Name</label>
-            <input
-              type="text"
-              id="vendorName"
-              name="vendorName"
-              value={formData.vendorName}
-              onChange={handleInputChange}
-            />
+            <label>Vendor Name</label>
+            <input name="vendorName" value={formData.vendorName} onChange={handleInputChange} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="vendorCode">Vendor Code</label>
-            <input
-              type="text"
-              id="vendorCode"
-              name="vendorCode"
-              value={formData.vendorCode}
-              onChange={handleInputChange}
-            />
+            <label>Vendor Code</label>
+            <input name="vendorCode" value={formData.vendorCode} onChange={handleInputChange} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="vendorType">Vendor Type</label>
-            <select
-              id="vendorType"
-              name="vendorType"
-              value={formData.vendorType}
-              onChange={handleInputChange}
-            >
+            <label>Vendor Type</label>
+            <select name="vendorType" value={formData.vendorType} onChange={handleInputChange}>
               <option value="">Select</option>
               <option value="Individual">Individual</option>
               <option value="Company">Company</option>
             </select>
           </div>
-
           <div className="form-group">
-            <label htmlFor="taxReg">Tax Registration</label>
-            <input
-              type="text"
-              id="taxReg"
-              name="taxReg"
-              value={formData.taxReg}
-              onChange={handleInputChange}
-            />
+            <label>Tax Registration</label>
+            <input name="taxReg" value={formData.taxReg} onChange={handleInputChange} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="companyReg">Company Registration</label>
-            <input
-              type="text"
-              id="companyReg"
-              name="companyReg"
-              value={formData.companyReg}
-              onChange={handleInputChange}
-            />
+            <label>Company Registration</label>
+            <input name="companyReg" value={formData.companyReg} onChange={handleInputChange} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="currency">Currency</label>
-            <select
-              id="currency"
-              name="currency"
-              value={formData.currency}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              {currencies.map((cur, i) => (
-                <option key={i} value={cur}>{cur}</option>
-              ))}
-            </select>
+            <label>Currency</label>
+            <Select
+              options={currencies}
+              value={currencies.find(c => c.value === formData.currency)}
+              onChange={opt => setFormData(prev => ({ ...prev, currency: opt.value }))}
+            />
           </div>
         </div>
 
-
-        {/* ADDRESS DETAILS */}
         <div className="card-section">
           <h5>Address Info</h5>
-
           <div className="form-group">
-            <label htmlFor="address1">Address Line 1</label>
-            <input
-              type="text"
-              id="address1"
-              name="address1"
-              value={formData.address1}
-              onChange={handleInputChange}
+            <label>Address Line 1</label>
+            <input name="address1" value={formData.address1} onChange={handleInputChange} />
+          </div>
+          <div className="form-group">
+            <label>Address Line 2</label>
+            <input name="address2" value={formData.address2} onChange={handleInputChange} />
+          </div>
+          <div className="form-group">
+            <label>Postal Code</label>
+            <input name="postalCode" value={formData.postalCode} onChange={handleInputChange} />
+          </div>
+          <div className="form-group">
+            <label>Country</label>
+            <Select
+              options={countries}
+              value={countries.find(c => c.value === formData.country)}
+              onChange={opt => setFormData(prev => ({ ...prev, country: opt.value, city: '' }))}
             />
           </div>
-
           <div className="form-group">
-            <label htmlFor="address2">Address Line 2</label>
-            <input
-              type="text"
-              id="address2"
-              name="address2"
-              value={formData.address2}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="postalCode">Postal Code</label>
-            <input
-              type="text"
-              id="postalCode"
-              name="postalCode"
-              value={formData.postalCode}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="country">Country</label>
-            <select
-              id="country"
-              name="country"
-              value={formData.country}
-              onChange={handleInputChange}
-            >
-              <option value="">Select</option>
-              {countries.map((c, i) => (
-                <option key={i} value={c}>{c}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="city">City</label>
-            <input
-              type="text"
-              id="city"
-              name="city"
-              value={formData.city}
-              onChange={handleInputChange}
+            <label>City</label>
+            <Select
+              options={cities}
+              value={cities.find(c => c.value === formData.city)}
+              onChange={opt => setFormData(prev => ({ ...prev, city: opt.value }))}
             />
           </div>
         </div>
 
-
-        {/* BANK DETAILS */}
         <div className="card-section">
           <h5>Bank Info</h5>
-
           <div className="form-group">
-            <label htmlFor="accountName">Account Name</label>
-            <input
-              type="text"
-              id="accountName"
-              name="accountName"
-              value={formData.accountName}
-              onChange={handleInputChange}
-            />
+            <label>Account Name</label>
+            <input name="accountName" value={formData.accountName} onChange={handleInputChange} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="accountNumber">Account Number</label>
-            <input
-              type="number"
-              id="accountNumber"
-              name="accountNumber"
-              value={formData.accountNumber}
-              onChange={handleInputChange}
-            />
+            <label>Account Number</label>
+            <input name="accountNumber" type="number" value={formData.accountNumber} onChange={handleInputChange} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="bankName">Bank Name</label>
-            <input
-              type="text"
-              id="bankName"
-              name="bankName"
-              value={formData.bankName}
-              onChange={handleInputChange}
-            />
+            <label>Bank Name</label>
+            <input name="bankName" value={formData.bankName} onChange={handleInputChange} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="branch">Branch</label>
-            <input
-              type="text"
-              id="branch"
-              name="branch"
-              value={formData.branch}
-              onChange={handleInputChange}
-            />
+            <label>Branch</label>
+            <input name="branch" value={formData.branch} onChange={handleInputChange} />
           </div>
-
           <div className="form-group">
-            <label htmlFor="swiftCode">SWIFT Code</label>
-            <input
-              type="text"
-              id="swiftCode"
-              name="swiftCode"
-              value={formData.swiftCode}
-              onChange={handleInputChange}
-            />
+            <label>SWIFT Code</label>
+            <input name="swiftCode" value={formData.swiftCode} onChange={handleInputChange} />
           </div>
         </div>
 
-        {/* CONTACTS */}
         <div className="card-section">
           <h5>Contact Info</h5>
           <table className="contact-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Mobile</th>
-                <th>Action</th>
+                <th>Name</th><th>Email</th><th>Mobile</th><th>Action</th>
               </tr>
             </thead>
             <tbody>
               {contacts.map((contact, index) => (
                 <tr key={index}>
                   <td><input value={contact.name} placeholder='Name' onChange={e => handleContactChange(index, 'name', e.target.value)} /></td>
-                  <td><input value={contact.email} placeholder='E-mail' onChange={e => handleContactChange(index, 'email', e.target.value)} /></td>
-                  <td><input value={contact.mobile} type='number' placeholder='Phone' onChange={e => handleContactChange(index, 'mobile', e.target.value)} /></td>
-                  <td>
-                    {contacts.length > 1 && (
-                      <button className="btn-delete" onClick={() => removeContact(index)}>Delete</button>
-                    )}
-                  </td>
+                  <td><input value={contact.email} placeholder='email' onChange={e => handleContactChange(index, 'email', e.target.value)} /></td>
+                  <td><input type="number" value={contact.mobile} placeholder='Mobile' onChange={e => handleContactChange(index, 'mobile', e.target.value)} /></td>
+                  <td>{contacts.length > 1 && <button className='btn-delete' type="button" onClick={() => removeContact(index)}>Delete</button>}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <button className="btn-add" onClick={addContact}>Add Contact</button>
+          <button className='btn-add' type="button" onClick={addContact}> + Add Contact</button>
         </div>
-      </div>
 
-      {/* SUBMIT BUTTON */}
-      <div className="edit-btn-row">
-        <button className="btn-back" style={{ height: '40px' }} onClick={() => 
-          {navigate('/dashboard');
-            toast.info('Fetched to Vendors Screen')
-          }}>Cancel</button>
-        <button className="btn-submit" style={{ padding: '10px', height: '40px', marginRight: '80%', marginTop: '3%' }} onClick={handleSubmit}>Create Vendor</button>
-        
+        <div className="edit-btn-row">
+          <button className="btn-submit" style={{ padding: '10px', height: '40px',}} type="button" onClick={handleSubmit}>Create Vendor</button>
+          <button className="btn-back" style={{ height: '40px', marginBottom:'50%' }}  type="button" onClick={() => { navigate('/dashboard'); toast.info('Fetched to Vendors Screen'); }}>Cancel</button>
+        </div>
       </div>
     </div>
   );
-
 };
 
 export default VendorCreate;
