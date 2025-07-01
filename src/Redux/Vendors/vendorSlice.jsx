@@ -44,8 +44,11 @@ const vendorSlice = createSlice({
     
     fetchVendorDetailsSuccess: (state, action) => {
       state.selectedVendor = action.payload;
+       state.loading = false;
     },
     fetchVendorDetailsFailure: (state, action) => {
+      state.selectedVendor = null;
+      state.loading = false;
       state.error = action.payload;
     },
 

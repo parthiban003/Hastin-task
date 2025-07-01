@@ -29,70 +29,92 @@ const VendorEdit = () => {
     accountNumber: '',
     bankName: '',
     branch: '',
-    swiftCode: ''
+    swiftCode: '',
   });
 
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
-    fetchInitialData();
-    if (id) fetchVendorDetails(id);
-  }, [id]);
+    const fetchData = async () => {
+      const token = localStorage.getItem('authToken');
 
-  const fetchInitialData = async () => {
-    try {
-      const [countryRes, currencyRes] = await Promise.all([
-        axios.get('https://hastin-container.com/staging/api/meta/country'),
-        axios.get('https://hastin-container.com/staging/api/meta/currencies')
-      ]);
-      setCountries(countryRes.data.data.map(c => ({ value: c.name, label: c.name })));
-      setCurrencies(currencyRes.data.data.map(c => ({ value: c.name, label: c.name })));
-    } catch (error) {
-      toast.error('Error loading metadata');
-    }
-  };
-
-  const fetchVendorDetails = async (vendorId) => {
-    try {
-      const response = await axios.post(
-        `/staging/api/vendor/${vendorId}`,
-        {},
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `BslogiKey ${token}`,
-          },
+      const fetchCities = async (countryName) => {
+        try {
+          const response = await axios.post(
+            'https://hastin-container.com/staging/api/countryCities/get',
+            { country: countryName },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `BslogiKey ${token}`,
+              },
+            }
+          );
+          const cityList = response.data?.data || [];
+          setCities(cityList.map(city => ({ label: city, value: city })));
+        } catch (err) {
+          console.error('City fetch error:', err);
+          toast.error('Failed to fetch cities');
         }
-      );
+      };
 
-      if (response.data?.data) {
-        const v = response.data.data;
-        setFormData({
-          vendorName: v.vendorName || '',
-          vendorCode: v.vendorCode || '',
-          vendorType: v.vendorType || '',
-          taxReg: v.taxRegistrationNo || '',
-          companyReg: v.companyRegistrationNo || '',
-          currency: v.defaultCurrency || '',
-          address1: v.address1 || '',
-          address2: v.address2 || '',
-          postalCode: v.postalCode || '',
-          country: v.country || '',
-          city: v.city || '',
-          accountName: v.accountName || '',
-          accountNumber: v.accountNumber || '',
-          bankName: v.bankName || '',
-          branch: v.branch || '',
-          swiftCode: v.swiftCode || ''
-        });
-        setContacts(v.contacts || []);
-        if (v.country) fetchCities(v.country);
+      try {
+        const [countryRes, currencyRes] = await Promise.all([
+          axios.get('https://hastin-container.com/staging/api/meta/country'),
+          axios.get('https://hastin-container.com/staging/api/meta/currencies')
+        ]);
+
+        setCountries(countryRes.data.data.map(c => ({ value: c.name, label: c.name })));
+        setCurrencies(currencyRes.data.data.map(c => ({ value: c.name, label: c.name })));
+      } catch (error) {
+        toast.error('Error loading metadata');
       }
-    } catch (err) {
-      console.error('Failed to fetch vendor', err);
-      toast.error('Failed to fetch vendor details');
-    }
-  };
+
+      if (id) {
+        try {
+          const response = await axios.get(
+            `https://hastin-container.com/staging/api/vendor/${id}`,
+            {},
+            {
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `BslogiKey ${token}`,
+              },
+            }
+          );
+
+          if (response.data?.data) {
+            const v = response.data.data;
+            setFormData({
+              vendorName: v.vendorName || '',
+              vendorCode: v.vendorCode || '',
+              vendorType: v.vendorType || '',
+              taxReg: v.taxRegistrationNo || '',
+              companyReg: v.companyRegistrationNo || '',
+              currency: v.defaultCurrency || '',
+              address1: v.address1 || '',
+              address2: v.address2 || '',
+              postalCode: v.postalCode || '',
+              country: v.country || '',
+              city: v.city || '',
+              accountName: v.accountName || '',
+              accountNumber: v.accountNumber || '',
+              bankName: v.bankName || '',
+              branch: v.branch || '',
+              swiftCode: v.swiftCode || ''
+            });
+            setContacts(v.contacts || []);
+            if (v.country) fetchCities(v.country);
+          }
+        } catch (err) {
+          console.error('Failed to fetch vendor', err);
+          toast.error('Failed to fetch vendor details');
+        }
+      }
+    };
+
+    fetchData();
+  }, [id]);
 
   const fetchCities = async (countryName) => {
     try {
@@ -104,14 +126,12 @@ const VendorEdit = () => {
             'Content-Type': 'application/json',
             Authorization: `BslogiKey ${token}`,
           },
-           body: JSON.stringify({ id })
         }
       );
       const cityList = response.data?.data || [];
       setCities(cityList.map(city => ({ label: city, value: city })));
     } catch (err) {
       console.error('City fetch error:', err);
-      toast.error('Failed to fetch cities');
     }
   };
 
@@ -128,7 +148,7 @@ const VendorEdit = () => {
     try {
       await axios.put(
         `https://hastin-container.com/staging/api/vendor/update`,
-        { id, ...formData },
+        { id, ...formData, contacts },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -142,6 +162,22 @@ const VendorEdit = () => {
     } catch (err) {
       toast.error('Failed to update vendor');
     }
+  };
+
+  const addContact = () => {
+    setContacts([...contacts, { name: '', email: '', phone: '', isDefault: false }]);
+  };
+
+  const updateContact = (index, field, value) => {
+    const updated = [...contacts];
+    updated[index][field] = value;
+    setContacts(updated);
+  };
+
+  const deleteContact = (index) => {
+    const updated = [...contacts];
+    updated.splice(index, 1);
+    setContacts(updated);
   };
 
   return (
@@ -182,7 +218,7 @@ const VendorEdit = () => {
               onChange={(opt) => {
                 handleChange('country', opt.value);
                 fetchCities(opt.value);
-                handleChange('city', ''); // clear previous city
+                handleChange('city', '');
               }}
             />
           </div>
@@ -204,9 +240,51 @@ const VendorEdit = () => {
           <div className="form-group"><label>SWIFT Code</label><input value={formData.swiftCode} onChange={e => handleChange('swiftCode', e.target.value)} /></div>
         </div>
 
+        <div className="card-section">
+          <h5>Contact Info</h5>
+          <table className="contact-table">
+            <thead>
+              <tr>
+                <th>S.NO</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Is Default</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {contacts.map((contact, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td><input placeholder='Name' value={contact.name} onChange={(e) => updateContact(index, 'name', e.target.value)} /></td>
+                  <td><input placeholder='E-mail' value={contact.email} onChange={(e) => updateContact(index, 'email', e.target.value)} /></td>
+                  <td><input placeholder='Phone' value={contact.phone} onChange={(e) => updateContact(index, 'phone', e.target.value)} /></td>
+                  <td>
+                    <select
+                      value={contact.isDefault ? 'YES' : 'NO'}
+                      onChange={(e) => updateContact(index, 'isDefault', e.target.value === 'YES')}
+                    >
+                      <option value="NO">NO</option>
+                      <option value="YES">YES</option>
+                    </select>
+                  </td>
+                  <td>
+                <button className='btn-delete' type="button" onClick={() => deleteContact(index)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <button type="button" className="btn btn-primary mt-2" onClick={addContact}>+ Add Contact</button>
+        </div>
+
         <div className="form-actions">
           <button type="submit" className="btn-submit">Update Vendor</button>
-          <button type="button" className="btn-back" onClick={() => navigate('/dashboard')}>Back</button>
+          <button type="button" className="btn-back" onClick={() => {
+            navigate('/dashboard');
+            toast.success('Fetched to Vendors')
+          }}>Back</button>
         </div>
       </form>
     </div>

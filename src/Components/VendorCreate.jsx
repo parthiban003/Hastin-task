@@ -111,7 +111,6 @@ const VendorCreate = () => {
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error('Error creating vendor');
     }
   };
 

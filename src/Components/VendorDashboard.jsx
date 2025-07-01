@@ -19,7 +19,7 @@ const VendorDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { vendors = [], inactiveVendors = [], loading, error } = useSelector(
+  const { vendors = [], inactiveVendors = [], loading, } = useSelector(
     state => state.vendor || {}
   );
 
@@ -86,7 +86,7 @@ const VendorDashboard = () => {
       <div className="topbar-wrapper">
         <h2>HASTIN</h2>
         <Dropdown align="end">
-          <Dropdown.Toggle variant="light" className="icon-toggle">
+          <Dropdown.Toggle variant="white" className="icon-toggle">
             <FontAwesomeIcon icon={faUserCircle} size="lg" />
           </Dropdown.Toggle>
           <Dropdown.Menu>
