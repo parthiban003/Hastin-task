@@ -1,8 +1,9 @@
 import React from 'react';
 import './OTP.css';
 import Loader from './Loader';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 
 
 const OTPModal = ({ captcha, otp, timer, onVerify, onResend, onClose, loading }) => {
@@ -21,14 +22,13 @@ const OTPModal = ({ captcha, otp, timer, onVerify, onResend, onClose, loading })
               <input type="text" value={otp} readOnly />
             </div>
             <div className="otp-timer">
-              ⏳ {`1:${timer < 10 ? `0${timer}` : timer}`}
+              ⏳ {`: ${timer < 10 ? `0${timer}` : timer}`}
             </div>
             <div className="otp-actions">
               <button
                 className="otp-submit"
                 onClick={() => {
                   toast.success("OTP Submitted");
-                  toast.success("Login Successfully");
                   onVerify();
                 }}
               >

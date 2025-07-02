@@ -44,7 +44,13 @@
   color: #123c69;
 }
 img{
-  height: 485px;
+  height: 30rem;
+  border-radius: 6px;
+}
+@media screen and (max-width: 1224px) and (min-width: 751px){
+  img{
+    height: 26rem;
+  }
 }
  @media screen and (max-width: 750px) {
   .login-container {
@@ -102,6 +108,7 @@ img{
     text-align: center;
     display: block;
   }
+ 
 }
 
 

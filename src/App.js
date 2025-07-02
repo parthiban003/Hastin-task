@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import Form from './Components/Form';
 import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom';
@@ -7,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import VendorEdit from './Components/VendorEdit';
 import VendorCreate from './Components/VendorCreate';
 import { ToastContainer } from 'react-toastify';
+import AccessCodeModal from './Components/AccessCodeModal';
 
 
 
@@ -16,6 +16,7 @@ function App() {
       
         <Routes>
           <Route path="/" element={<Form />} />
+          <Route path='/' element={<AccessCodeModal />}/>
           <Route path="/dashboard" element={<VendorDashboard />} />
           <Route path="/vendoredit/:id" element={<VendorEdit />} />
           <Route path='/vendorcreate' element={<VendorCreate />} />
