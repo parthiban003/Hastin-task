@@ -186,7 +186,6 @@ const VendorDashboard = () => {
                             className="dropdown-btn edit-btn"
                             onClick={() => {
                               navigate(`/vendoredit/${vendor.id}`);
-                              toast.info("Fetched to Edit Vendor");
                               setActionMenu(null);
                             }}
                           >

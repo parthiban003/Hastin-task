@@ -40,7 +40,7 @@
 }
 
 .login-right h2 {
-  margin-left: 2rem;
+  margin-left: 3rem;
   color: #123c69;
 }
 img{
@@ -83,13 +83,6 @@ img{
     padding: 1.5rem;
     box-shadow: -4px 0 10px rgba(0, 0, 0, 0.6);
     align-items: center;
-  }
-
-  .login-right h2 {
-    margin-left: 0;
-    margin-bottom: 2rem;
-    text-align: center;
-    font-size: 1.5rem;
   }
 
   .login-right input[type="text"],

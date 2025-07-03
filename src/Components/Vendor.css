@@ -30,10 +30,6 @@ h2 {
   transition: all 0.3s ease;
 }
 
-.tab:hover {
-  background-color: #dcdfe3;
-}
-
 .tab.active {
   border-bottom: 2px solid #cc0101;
   color: #cc0101;
@@ -124,8 +120,8 @@ h2 {
 }
 
 .badge-active {
-  background-color: #ade9bc;
-  color: #14833b;
+  background-color: #32b352;
+  color: #08c249;
 }
 
 .badge-inactive {
@@ -236,7 +232,7 @@ h2 {
 .topbar-wrapper {
   width: 100%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 12px 24px;
   background-color: #ffffff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);

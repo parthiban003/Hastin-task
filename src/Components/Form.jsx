@@ -12,14 +12,38 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+     const { name, value } = e.target;
+  setForm((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+
+  
+  if (errors[name]) {
+    setErrors((prev) => ({
+      ...prev,
+      [name]: '',
+    }));
+  }
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const newErrors = {};
+    if (!form.username.trim()) {
+      newErrors.username = 'Username is required';
+    }
+    if (!form.password.trim()) {
+      newErrors.password = 'Password is required';
+    }
+
+    setErrors(newErrors);
     setIsLoading(true);
+
     try {
       const res = await axios.post(
         'https://hastin-container.com/staging/app/auth/login',
@@ -44,12 +68,12 @@ const LoginPage = () => {
         localStorage.setItem('accessCode', accessCode);
 
         toast.success('OTP sent successfully!');
-        setModalVisible(true); 
+        setModalVisible(true);
       }
 
     } catch (error) {
       console.error(error);
-      toast.error('Invalid Name or Password.');
+      toast.error('Invalid Name or Password');
     } finally {
       setIsLoading(false);
     }
@@ -70,16 +94,22 @@ const LoginPage = () => {
             placeholder="User Name"
             value={form.username}
             onChange={handleChange}
-            required
           />
+          {errors.username && (
+            <div style={{ color: 'red', fontSize: '0.875rem' }}>{errors.username}</div>
+          )}
+
           <input
             type={showPassword ? 'text' : 'password'}
             name="password"
             placeholder="Password"
             value={form.password}
             onChange={handleChange}
-            required
           />
+          {errors.password && (
+            <div style={{ color: 'red', fontSize: '0.875rem' }}>{errors.password}</div>
+          )}
+
           <label className="show-password-label">
             <input
               type="checkbox"
@@ -87,11 +117,12 @@ const LoginPage = () => {
               onChange={() => setShowPassword(!showPassword)}
             /> Show Password
           </label>
+
           <br />
           <a href="/" className="forgot-link">🔒 Forgot password?</a><br /><br />
 
           <button type="submit" className="login-btn" disabled={isLoading}>
-            {isLoading ? <Loader size="sm" /> : 'Login'}
+            {isLoading ? <Loader size="md" /> : 'Login'}
           </button>
 
           <AccessCodeModal
@@ -99,6 +130,7 @@ const LoginPage = () => {
             onClose={() => setModalVisible(false)}
           />
         </form>
+
       </div>
     </div>
   );

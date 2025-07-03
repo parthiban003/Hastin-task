@@ -1,60 +1,63 @@
+// src/redux/AccessCode/accessCodeSaga.js
 import { call, put, takeLatest } from 'redux-saga/effects';
-import axios from 'axios';
-import * as types from './accessCodeTypes';
+// import axiosInstance from '../../utils/axiosInstance';
+import {
+  ACCESS_CODE_REQUEST,
+  RESEND_OTP_REQUEST,
+} from './accessCodeTypes';
+import {
+  accesscodeSuccess,
+  accesscodeFailure,
+  resendOtpSuccess,
+  resendOtpFailure,
+} from './accessCodeActions';
+import axiosInstance from '../../Components/axiosInstance';
 
-function* validateAccessCodeSaga(action) {
+function* accesscodeRequestSaga(action) {
   try {
-    const token = localStorage.getItem('authToken');
-    const response = yield call(axios.post,
-      'https://hastin-container.com/staging/app/auth/access-code/validate',
-      action.payload,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `BslogiKey ${token}`,
-          ApplicationLabel: 'demo',
-        },
-      }
+    const response = yield call(() =>
+      axiosInstance.post('/auth/access-code/validate', action.payload)
     );
-
-    localStorage.setItem('authToken', response.data.data.jwt);
-    yield put({ type: types.ACCESS_CODE_SUCCESS, payload: response.data });
+    yield put(accesscodeSuccess(response.data));
   } catch (error) {
-    yield put({
-      type: types.ACCESS_CODE_FAILURE,
-      payload: error.response?.data?.message || error.message,
-    });
+    yield put(
+      accesscodeFailure(error?.response?.data?.message || 'OTP validation failed')
+    );
   }
 }
 
 function* resendOtpSaga() {
   try {
-    const response = yield call(axios.post,
-      'https://hastin-container.com/staging/app/auth/access-code/resend',
-      {},
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ApplicationLabel: 'demo',
-        },
-      }
+    const response = yield call(() =>
+      axiosInstance.post(
+        '/auth/access-code/resend',
+        {}, 
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
     );
 
     const { accessCode, opaque, jwt } = response.data.data;
+
+    if (jwt) {
+      localStorage.setItem('authToken', jwt);
+    }
     localStorage.setItem('accessCode', accessCode);
     localStorage.setItem('opaque', opaque);
-    localStorage.setItem('authToken', jwt);
 
-    yield put({ type: types.RESEND_OTP_SUCCESS, payload: response.data });
+    yield put(resendOtpSuccess(response.data));
   } catch (error) {
-    yield put({
-      type: types.RESEND_OTP_FAILURE,
-      payload: error.response?.data?.message || error.message,
-    });
+    yield put(
+      resendOtpFailure(error?.response?.data?.message || 'OTP resend failed')
+    );
   }
 }
 
+
 export default function* accessCodeSaga() {
-  yield takeLatest(types.ACCESS_CODE_REQUEST, validateAccessCodeSaga);
-  yield takeLatest(types.RESEND_OTP_REQUEST, resendOtpSaga);
+  yield takeLatest(ACCESS_CODE_REQUEST, accesscodeRequestSaga);
+  yield takeLatest(RESEND_OTP_REQUEST, resendOtpSaga);
 }
