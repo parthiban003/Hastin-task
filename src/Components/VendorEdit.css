@@ -1,14 +1,14 @@
 .edit-vendor-container {
   padding: 2rem;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f4f6f9;
+  background-color: #f9fbfc;
   min-height: 100vh;
 }
 
 .edit-vendor-container h2 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #2b3674;
+  font-size: 30px;
+  font-weight: 700;
+  color: #1a237e;
   margin-bottom: 2rem;
 }
 
@@ -22,13 +22,13 @@
   background-color: #fff;
   padding: 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   flex: 1;
   min-width: 360px;
 }
 
 .card-section h5 {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   color: #2b3674;
   margin-bottom: 1rem;
@@ -45,62 +45,78 @@
 .card-section label {
   font-size: 14px;
   margin-bottom: 0.3rem;
-  color: #444;
+  color: #555;
+  font-weight: 500;
 }
 
 .card-section input,
 .card-section select {
   padding: 0.6rem 0.8rem;
   font-size: 14px;
-  border: 1px solid #ccc;
+  border: 1px solid #bbb;
   border-radius: 6px;
   outline: none;
   transition: border-color 0.3s ease;
+  background-color: #fdfdfd;
 }
 
 .card-section input:focus,
 .card-section select:focus {
   border-color: #4a6cf7;
+  box-shadow: 0 0 0 2px rgba(74, 108, 247, 0.2);
 }
 
 .edit-btn-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 12px;
   margin-top: 2rem;
   flex-wrap: wrap;
-  gap: 10px;
 }
 
-.btn-back,
+/* .btn-back,
 .btn-submit {
-  padding: 0.6rem 1.2rem;
+   height: 40px;
+   width: 150px;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+} */
+.header {
+  display: flex;
+  justify-content: space-between;
 }
-
 .btn-back {
-  background-color: #4a6cf7;
-  color: #f0eded;
-  margin-left: 1%;
+  background-color: #b0bec5;
+  color: #fffcfc;
+  height: 40px;
+  margin-left: 3%;
+  font-weight: 500;
 }
 
 .btn-back:hover {
-  background-color: #2149a0;
+  background-color: #90a4ae;
+  color: white;
+}
+.error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
 }
 
 .btn-submit {
-  background-color: #4a6cf7;
-  margin-bottom: 10%;
+  background-color: #1c50df;
   color: white;
-
+  margin-left: 2.5%;
+  font-weight: 500;
 }
 
 .btn-submit:hover {
   background-color: #2149a0;
+  color: wheat;
 }
 
 .react-select-container {
@@ -116,6 +132,15 @@
 .react-select__menu {
   z-index: 1000;
 }
+.contact-section {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  flex: 1;
+  min-width: 360px;
+  max-width: 100%;
+}
 
 .contact-table {
   width: 100%;
@@ -123,11 +148,14 @@
   margin-bottom: 1rem;
   border: 1px solid #ddd;
   border-radius: 6px;
+  background-color: white;
 }
+
 input::-webkit-inner-spin-button,
-input::-webkit-outer-spin-button{
-	-webkit-appearance:none;
+input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
 }
+
 .contact-table th,
 .contact-table td {
   border: 1px solid #ddd;
@@ -135,9 +163,13 @@ input::-webkit-outer-spin-button{
   font-size: 14px;
   text-align: left;
 }
-.contact-table th{
-  background-color: gainsboro;
+
+.contact-table th {
+  background-color: #e3e7ed;
+  font-weight: 600;
+  color: #333;
 }
+
 .contact-table input,
 .contact-table select {
   width: 100%;
@@ -146,53 +178,56 @@ input::-webkit-outer-spin-button{
   border-radius: 4px;
   font-size: 13px;
   outline: none;
+  background-color: #fafafa;
 }
 
 .btn-add {
-  background-color: #6366f1;
+  background-color: #4a6cf7;
   color: white;
-  padding: 8px 14px;
+  padding: 8px 16px;
   border: none;
   border-radius: 6px;
   margin-top: 12px;
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
 
 .btn-add:hover {
-  background-color: #4f51d6;
+  background-color: #3752d6;
 }
 
 .btn-save {
-  background-color: #4caf50;
+  background-color: #2e7d32;
   border: none;
   color: white;
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
-  margin-right: 6px;
+  font-weight: 500;
   transition: background-color 0.2s ease-in-out;
 }
 
 .btn-save:hover {
-  background-color: #45a049;
+  background-color: #256428;
 }
 
 .btn-delete {
-  background-color: #f44336;
+  background-color: #d32f2f;
   border: none;
   color: white;
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 500;
   transition: background-color 0.2s ease-in-out;
 }
 
 .btn-delete:hover {
-  background-color: #d32f2f;
+  background-color: #b71c1c;
 }
 
 @media (max-width: 1024px) {
@@ -226,7 +261,7 @@ input::-webkit-outer-spin-button{
 
   .btn-back,
   .btn-submit {
-    width: 50%;
+    width: 25%;
   }
 }
 

@@ -18,6 +18,7 @@ const VendorCreate = () => {
   const [countries, setCountries] = useState([]);
   const [currencies, setCurrencies] = useState([]);
   const [cities, setCities] = useState([]);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     fetch('https://hastin-container.com/staging/api/meta/country')
@@ -31,7 +32,7 @@ const VendorCreate = () => {
 
   useEffect(() => {
     if (formData.country) {
-      fetch('/staging/api/countryCities/get', {
+      fetch('https://hastin-container.com/staging/staging/api/countryCities/get', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ country: formData.country })
@@ -39,7 +40,7 @@ const VendorCreate = () => {
         .then(res => res.json())
         .then(data => {
           if (data?.data?.length) {
-            setCities(data.data.map(c => ({ value: c.city, label: c.city })));
+            setCities(data.data.map(c => ({ value: c.city, label: c.city })) || []);
           } else {
             setCities([]);
           }
@@ -49,7 +50,13 @@ const VendorCreate = () => {
 
   const handleInputChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+     const { name, value } = e.target;
+
+  if (errors[name]) {
+    setErrors(prev => ({ ...prev, [name]: '' }));
+  }
+};
+
 
   const handleContactChange = (index, field, value) => {
     const updated = [...contacts];
@@ -68,51 +75,95 @@ const VendorCreate = () => {
   };
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('authToken');
+  const newErrors = {};
 
-    const payload = {
-      vendorName: formData.vendorName,
-      vendorCode: formData.vendorCode,
-      vendorType: formData.vendorType,
-      taxRegistrationNo: formData.taxReg,
-      companyRegistrationNo: formData.companyReg,
-      defaultCurrency: formData.currency,
-      address1: formData.address1,
-      address2: formData.address2,
-      postalCode: formData.postalCode,
-      country: formData.country,
-      city: formData.city,
-      accountName: formData.accountName,
-      accountNumber: formData.accountNumber,
-      bankName: formData.bankName,
-      branch: formData.branch,
-      swiftCode: formData.swiftCode,
-      contacts
-    };
+  Object.entries(formData).forEach(([key, value]) => {
+    if (!value) newErrors[key] = 'required';
+  });
 
-    try {
-      const response = await fetch('https://hastin-container.com/staging/api/vendor/create', {
+  contacts.forEach((c, i) => {
+    if (!c.name || !c.email || !c.mobile) {
+      newErrors[`contact-${i}`] = 'All contact fields are required';
+    }
+  });
+
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+  const vendorPayload = {
+    vendorName: formData.vendorName,
+    vendorCode: formData.vendorCode,
+    vendorType: formData.vendorType,
+    taxRegistrationNo: formData.taxReg,
+    companyRegistrationNo: formData.companyReg,
+    defaultCurrency: formData.currency,
+    address1: formData.address1,
+    address2: formData.address2,
+    postalCode: formData.postalCode,
+    country: formData.country,
+    city: formData.city,
+    accountName: formData.accountName,
+    accountNumber: formData.accountNumber,
+    bankName: formData.bankName,
+    branch: formData.branch,
+    swiftCode: formData.swiftCode,
+  };
+
+  try {
+    const vendorResponse = await fetch('https://hastin-container.com/staging/api/vendor/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `BslogiKey ${token}`
+      },
+      body: JSON.stringify(vendorPayload)
+    });
+
+    const vendorData = await vendorResponse.json();
+
+    if (vendorData?.data?.id) {
+      const vendorId = vendorData.data.id;
+
+      
+      const contactsPayload = contacts.map((c) => ({
+        name: c.name,
+        email: c.email,
+        mobile: c.mobile,
+        isDefault: true,
+        vendorId: vendorId
+      }));
+
+      const contactResponse = await fetch('https://hastin-container.com/staging/api/vendor/contact/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `BslogiKey ${token}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(contactsPayload)
       });
 
-      const data = await response.json();
+      const contactData = await contactResponse.json();
 
-      if (data?.message === "Vendor Created Successfully") {
-        toast.success("Vendor created successfully!");
+      if (contactResponse.status === 200 || contactResponse.ok) {
+        toast.success('Vendor and contact(s) created successfully!');
         navigate('/dashboard');
       } else {
-        toast.error("Failed to create vendor!");
-        console.log(data);
+        toast.error('Vendor created, but contact creation failed.');
+        console.error(contactData);
       }
-    } catch (error) {
-      console.error('Error:', error);
+
+    } else {
+      toast.error('Vendor creation failed.');
+      console.error(vendorData);
     }
-  };
+  } catch (error) {
+    console.error('Error:', error);
+    toast.error('An error occurred while creating vendor.');
+  }
+};
 
   return (
     <div className="edit-vendor-container">
@@ -123,10 +174,12 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Vendor Name</label>
             <input name="vendorName" value={formData.vendorName} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.vendorName}</span>}
           </div>
           <div className="form-group">
             <label>Vendor Code</label>
             <input name="vendorCode" value={formData.vendorCode} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.vendorCode}</span>}
           </div>
           <div className="form-group">
             <label>Vendor Type</label>
@@ -139,10 +192,12 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Tax Registration</label>
             <input name="taxReg" value={formData.taxReg} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.taxReg}</span>}
           </div>
           <div className="form-group">
             <label>Company Registration</label>
             <input name="companyReg" value={formData.companyReg} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.companyReg}</span>}
           </div>
           <div className="form-group">
             <label>Currency</label>
@@ -151,6 +206,7 @@ const VendorCreate = () => {
               value={currencies.find(c => c.value === formData.currency)}
               onChange={opt => setFormData(prev => ({ ...prev, currency: opt.value }))}
             />
+             {errors.vendorName && <span className="error-text">{errors.currency}</span>}
           </div>
         </div>
 
@@ -159,14 +215,17 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Address Line 1</label>
             <input name="address1" value={formData.address1} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.address1}</span>}
           </div>
           <div className="form-group">
             <label>Address Line 2</label>
             <input name="address2" value={formData.address2} onChange={handleInputChange} />
+             
           </div>
           <div className="form-group">
             <label>Postal Code</label>
             <input name="postalCode" value={formData.postalCode} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.postalCode}</span>}
           </div>
           <div className="form-group">
             <label>Country</label>
@@ -175,6 +234,7 @@ const VendorCreate = () => {
               value={countries.find(c => c.value === formData.country)}
               onChange={opt => setFormData(prev => ({ ...prev, country: opt.value, city: '' }))}
             />
+             {errors.vendorName && <span className="error-text">{errors.country}</span>}
           </div>
           <div className="form-group">
             <label>City</label>
@@ -183,6 +243,7 @@ const VendorCreate = () => {
               value={cities.find(c => c.value === formData.city)}
               onChange={opt => setFormData(prev => ({ ...prev, city: opt.value }))}
             />
+             {errors.vendorName && <span className="error-text">{errors.city}</span>}
           </div>
         </div>
 
@@ -191,22 +252,27 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Account Name</label>
             <input name="accountName" value={formData.accountName} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.accountName}</span>}
           </div>
           <div className="form-group">
             <label>Account Number</label>
             <input name="accountNumber" type="number" value={formData.accountNumber} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.accountNumber}</span>}
           </div>
           <div className="form-group">
             <label>Bank Name</label>
             <input name="bankName" value={formData.bankName} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.bankName}</span>}
           </div>
           <div className="form-group">
             <label>Branch</label>
             <input name="branch" value={formData.branch} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.branch}</span>}
           </div>
           <div className="form-group">
             <label>SWIFT Code</label>
             <input name="swiftCode" value={formData.swiftCode} onChange={handleInputChange} />
+             {errors.vendorName && <span className="error-text">{errors.swiftCode}</span>}
           </div>
         </div>
 
@@ -231,12 +297,9 @@ const VendorCreate = () => {
           </table>
           <button className='btn-add' type="button" onClick={addContact}> + Add Contact</button>
         </div>
-
-        <div className="edit-btn-row">
-          <button className="btn-submit" style={{ padding: '10px', height: '40px',}} type="button" onClick={handleSubmit}>Create Vendor</button>
-          <button className="btn-back" style={{ height: '40px', marginBottom:'50%' }}  type="button" onClick={() => { navigate('/dashboard'); toast.info('Fetched to Vendors Screen'); }}>Cancel</button>
-        </div>
-      </div>
+      </div><br />
+       <button className="btn btn-submit" type="button" onClick={handleSubmit}>Create Vendor</button>
+          <button className="btn btn-back" type="button" onClick={() => { navigate('/dashboard'); toast.info('Fetched to Vendors Screen'); }}>Cancel</button>
     </div>
   );
 };

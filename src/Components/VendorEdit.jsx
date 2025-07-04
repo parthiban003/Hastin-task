@@ -4,6 +4,7 @@ import Select from 'react-select';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import './VendorEdit.css';
+import axiosInstance from './axiosInstance';
 
 const VendorEdit = () => {
   const { id } = useParams();
@@ -72,7 +73,7 @@ const VendorEdit = () => {
 
       if (id) {
         try {
-          const response = await axios.get(
+          const response = await axiosInstance.get(
             `https://hastin-container.com/staging/api/vendor/${id}`,
             {},
             {
@@ -182,7 +183,10 @@ const VendorEdit = () => {
 
   return (
     <div className="edit-vendor-container">
-      <h2>Edit Vendor</h2>
+      <div className='header'>
+        <h2>Edit Vendor</h2>
+       
+      </div><br />
       <form className="edit-vendor-form" onSubmit={handleSubmit}>
         <div className="card-section">
           <h5>Basic Info</h5>
@@ -232,6 +236,7 @@ const VendorEdit = () => {
         </div>
 
         <div className="card-section">
+          
           <h5>Bank Info</h5>
           <div className="form-group"><label>Account Name</label><input value={formData.accountName} onChange={e => handleChange('accountName', e.target.value)} /></div>
           <div className="form-group"><label>Account Number</label><input value={formData.accountNumber} onChange={e => handleChange('accountNumber', e.target.value)} /></div>
@@ -240,7 +245,7 @@ const VendorEdit = () => {
           <div className="form-group"><label>SWIFT Code</label><input value={formData.swiftCode} onChange={e => handleChange('swiftCode', e.target.value)} /></div>
         </div>
 
-        <div className="card-section">
+        <div className="contact-section">
           <h5>Contact Info</h5>
           <table className="contact-table">
             <thead>
@@ -278,15 +283,13 @@ const VendorEdit = () => {
           </table>
           <button type="button" className="btn btn-primary mt-2" onClick={addContact}>+ Add Contact</button>
         </div>
-
-        <div className="form-actions">
-          <button type="submit" className="btn-submit">Update Vendor</button>
-          <button type="button" className="btn-back" onClick={() => {
+      </form>
+      <br />
+       <button type="submit" className="btn btn-submit">Update Vendor</button>
+       <button type="button" className="btn btn-back" onClick={() => {
             navigate('/dashboard');
             toast.success('Fetched to Vendors')
-          }}>Back</button>
-        </div>
-      </form>
+          }}> Back</button>
     </div>
   );
 };

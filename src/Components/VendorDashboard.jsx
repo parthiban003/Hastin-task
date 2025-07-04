@@ -113,7 +113,6 @@ const VendorDashboard = () => {
         </div>
 
         <button onClick={() => {navigate('/vendorcreate');
-          toast.info('Fetched to Create Vendor')
         }} className="btn-new">
           + New Vendor
         </button>
