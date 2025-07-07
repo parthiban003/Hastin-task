@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://hastin-container.com/staging/app', // change if needed
+  baseURL: 'https://hastin-container.com/staging/app',
   headers: {
     'Content-Type': 'application/json',
     'ApplicationLabel': 'demo',

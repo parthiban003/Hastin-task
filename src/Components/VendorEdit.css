@@ -246,6 +246,9 @@ input::-webkit-outer-spin-button {
     font-size: 13px;
     padding: 8px;
   }
+  .edit-vendor-container{
+    padding: 1rem;
+  }
 
   .btn-save,
   .btn-delete {

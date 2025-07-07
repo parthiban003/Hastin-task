@@ -31,10 +31,12 @@ const VendorCreate = () => {
   }, []);
 
   useEffect(() => {
+    const token = localStorage.getItem('authToken')
     if (formData.country) {
-      fetch('https://hastin-container.com/staging/staging/api/countryCities/get', {
+      fetch('/staging/api/countryCities/get', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        Authorization: `Bslogikey: ${token}`,
         body: JSON.stringify({ country: formData.country })
       })
         .then(res => res.json())
@@ -179,7 +181,7 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Vendor Code</label>
             <input name="vendorCode" value={formData.vendorCode} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.vendorCode}</span>}
+             {errors.vendorCode && <span className="error-text">{errors.vendorCode}</span>}
           </div>
           <div className="form-group">
             <label>Vendor Type</label>
@@ -192,12 +194,12 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Tax Registration</label>
             <input name="taxReg" value={formData.taxReg} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.taxReg}</span>}
+             {errors.taxReg && <span className="error-text">{errors.taxReg}</span>}
           </div>
           <div className="form-group">
             <label>Company Registration</label>
             <input name="companyReg" value={formData.companyReg} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.companyReg}</span>}
+             {errors.companyReg && <span className="error-text">{errors.companyReg}</span>}
           </div>
           <div className="form-group">
             <label>Currency</label>
@@ -215,7 +217,7 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Address Line 1</label>
             <input name="address1" value={formData.address1} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.address1}</span>}
+             {errors.address1 && <span className="error-text">{errors.address1}</span>}
           </div>
           <div className="form-group">
             <label>Address Line 2</label>
@@ -225,7 +227,7 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Postal Code</label>
             <input name="postalCode" value={formData.postalCode} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.postalCode}</span>}
+             {errors.postalCode && <span className="error-text">{errors.postalCode}</span>}
           </div>
           <div className="form-group">
             <label>Country</label>
@@ -234,7 +236,7 @@ const VendorCreate = () => {
               value={countries.find(c => c.value === formData.country)}
               onChange={opt => setFormData(prev => ({ ...prev, country: opt.value, city: '' }))}
             />
-             {errors.vendorName && <span className="error-text">{errors.country}</span>}
+             {errors.country && <span className="error-text">{errors.country}</span>}
           </div>
           <div className="form-group">
             <label>City</label>
@@ -243,7 +245,7 @@ const VendorCreate = () => {
               value={cities.find(c => c.value === formData.city)}
               onChange={opt => setFormData(prev => ({ ...prev, city: opt.value }))}
             />
-             {errors.vendorName && <span className="error-text">{errors.city}</span>}
+             {errors.city && <span className="error-text">{errors.city}</span>}
           </div>
         </div>
 
@@ -252,27 +254,27 @@ const VendorCreate = () => {
           <div className="form-group">
             <label>Account Name</label>
             <input name="accountName" value={formData.accountName} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.accountName}</span>}
+             {errors.accountName && <span className="error-text">{errors.accountName}</span>}
           </div>
           <div className="form-group">
             <label>Account Number</label>
             <input name="accountNumber" type="number" value={formData.accountNumber} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.accountNumber}</span>}
+             {errors.accountNumber && <span className="error-text">{errors.accountNumber}</span>}
           </div>
           <div className="form-group">
             <label>Bank Name</label>
             <input name="bankName" value={formData.bankName} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.bankName}</span>}
+             {errors.bankName && <span className="error-text">{errors.bankName}</span>}
           </div>
           <div className="form-group">
             <label>Branch</label>
             <input name="branch" value={formData.branch} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.branch}</span>}
+             {errors.branch && <span className="error-text">{errors.branch}</span>}
           </div>
           <div className="form-group">
             <label>SWIFT Code</label>
             <input name="swiftCode" value={formData.swiftCode} onChange={handleInputChange} />
-             {errors.vendorName && <span className="error-text">{errors.swiftCode}</span>}
+             {errors.swiftCode && <span className="error-text">{errors.swiftCode}</span>}
           </div>
         </div>
 

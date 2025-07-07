@@ -35,10 +35,10 @@ const LoginPage = () => {
     e.preventDefault();
     const newErrors = {};
     if (!form.username.trim()) {
-      newErrors.username = 'Username is required';
+      newErrors.username = 'required';
     }
     if (!form.password.trim()) {
-      newErrors.password = 'Password is required';
+      newErrors.password = 'required';
     }
 
     setErrors(newErrors);
