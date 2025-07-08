@@ -108,15 +108,15 @@
 }
 
 .btn-submit {
-  background-color: #1c50df;
+  background-color: #1043b1;
   color: white;
-  margin-left: 2.5%;
+  margin-left: 3%;
   font-weight: 500;
 }
 
 .btn-submit:hover {
   background-color: #2149a0;
-  color: wheat;
+  color: whitesmoke;
 }
 
 .react-select-container {
@@ -182,12 +182,13 @@ input::-webkit-outer-spin-button {
 }
 
 .btn-add {
-  background-color: #4a6cf7;
+  background-color: #2149a0;
   color: white;
   padding: 8px 16px;
   border: none;
   border-radius: 6px;
   margin-top: 12px;
+  margin-left: 1%;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -246,9 +247,7 @@ input::-webkit-outer-spin-button {
     font-size: 13px;
     padding: 8px;
   }
-  .edit-vendor-container{
-    padding: 1rem;
-  }
+  
 
   .btn-save,
   .btn-delete {

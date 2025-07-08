@@ -281,7 +281,7 @@ const VendorEdit = () => {
               ))}
             </tbody>
           </table>
-          <button type="button" className="btn btn-primary mt-2" onClick={addContact}>+ Add Contact</button>
+          <button type="button" className="btn-add mt-2" onClick={addContact}>+ Add Contact</button>
         </div>
       </form>
       <br />

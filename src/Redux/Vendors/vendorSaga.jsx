@@ -128,12 +128,12 @@ function* fetchCitiesSaga(action) {
   try {
     const config = yield call(getAuthHeaders);
     const response = yield call(
-      axiosInstance.get,
+      axiosInstance.post,
       fetch `https://hastin-container.com/staging/api/countryCities/get`,
       { country: action.payload }, 
       config,
     );
-    yield put(fetchCitiesSuccess(response.data?.data || []));
+    yield put(fetchCitiesSuccess(response.data?.data));
   } catch (error) {
     yield put(fetchCitiesFailure(error?.response?.data?.message || error.message));
   }

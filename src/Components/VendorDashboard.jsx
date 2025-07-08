@@ -86,8 +86,8 @@ const VendorDashboard = () => {
       <div className="topbar-wrapper">
         <h2>HASTIN</h2>
         <Dropdown align="end">
-          <Dropdown.Toggle variant="white" className="icon-toggle">
-            <FontAwesomeIcon icon={faUserCircle} size="lg" />
+          <Dropdown.Toggle variant="white" className="icon-toggle" title='Logout'>
+            <FontAwesomeIcon icon={faUserCircle} size="lg" title='Logout'/>
           </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={handleLogout} className='logout-btn'>Logout</Dropdown.Item>
@@ -124,6 +124,7 @@ const VendorDashboard = () => {
           type="text"
           id='vendor-search'
           name='search'
+          title='Search'
           placeholder="Search"
           className="search-input"
           value={searchTerm}
@@ -173,6 +174,7 @@ const VendorDashboard = () => {
                     <td style={{ position: 'relative' }}>
                       <button
                         className="btn-action"
+                        title='Edit & Action'
                         onClick={() => {
                           setActionMenu(actionMenu === vendor.id ? null : vendor.id);
                         }}
