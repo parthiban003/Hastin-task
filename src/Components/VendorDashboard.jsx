@@ -82,7 +82,7 @@ const VendorDashboard = () => {
 
   return (
     <div className="vendor-container">
-      {/* Topbar */}
+      
       <div className="topbar-wrapper">
         <h2>HASTIN</h2>
         <Dropdown align="end">
@@ -95,7 +95,7 @@ const VendorDashboard = () => {
         </Dropdown>
       </div>
 
-      {/* Tabs and New Vendor */}
+     
       <div className="vendor-header">
         <div className="tabs">
           {['ACTIVE', 'INACTIVE'].map(tab => (
@@ -118,7 +118,7 @@ const VendorDashboard = () => {
         </button>
       </div>
 
-      {/* Search */}
+      
       <div className="vendor-toolbar">
         <input
           type="text"
@@ -132,7 +132,7 @@ const VendorDashboard = () => {
         />
       </div>
 
-      {/* Vendor Table */}
+     
       <div className="table-scroll">
         {loading ? (
           <div className="status-msg">Loading...</div>
@@ -215,7 +215,7 @@ const VendorDashboard = () => {
         )}
       </div>
 
-      {/* Modal Confirm */}
+      
       {confirmModal && (
         <div className="modal-overlay">
           <div className="confirm-modal">
@@ -228,7 +228,7 @@ const VendorDashboard = () => {
         </div>
       )}
 
-      {/* Pagination */}
+      
       <div className="pagination">
         <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
           &lt;

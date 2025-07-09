@@ -11,12 +11,12 @@ import {
   resendOtpSuccess,
   resendOtpFailure,
 } from './accessCodeActions';
-import axiosInstance from '../../Components/axiosInstance';
+import API_BASE_URL from '../../Components/axiosInstance';
 
 function* accesscodeRequestSaga(action) {
   try {
     const response = yield call(() =>
-      axiosInstance.post('/auth/access-code/validate', action.payload)
+      API_BASE_URL.post('https://hastin-container.com/staging/app/auth/access-code/validate', action.payload)
     );
     yield put(accesscodeSuccess(response.data));
   } catch (error) {
@@ -29,8 +29,8 @@ function* accesscodeRequestSaga(action) {
 function* resendOtpSaga() {
   try {
     const response = yield call(() =>
-      axiosInstance.post(
-        '/auth/access-code/resend',
+      API_BASE_URL.post(
+        'https://hastin-container.com/staging/app/auth/access-code/resend',
         {}, 
         {
           headers: {

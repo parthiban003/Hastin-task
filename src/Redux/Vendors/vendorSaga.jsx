@@ -16,7 +16,7 @@ import {
   fetchCitiesFailure,
 } from './vendorSlice';
 import { toast } from 'react-toastify';
-import axiosInstance from '../../Components/axiosInstance';
+import API_BASE_URL from '../../Components/axiosInstance';
 
 
 function getAuthHeaders() {
@@ -75,7 +75,7 @@ function* markInactiveSaga(action) {
   try {
     
     const res = yield call(
-      axiosInstance.put,
+      API_BASE_URL.put,
       'https://hastin-container.com/staging/api/vendor/status/update',
       { vendorId: action.payload, status: 'INACTIVE' },
       getAuthHeaders()
@@ -91,7 +91,7 @@ function* markInactiveSaga(action) {
 function* markActiveSaga(action) {
   try {
     yield call(
-      axiosInstance.put,
+      API_BASE_URL.put,
       'https://hastin-container.com/staging/api/vendor/status/update',
       { vendorId: action.payload, status: 'ACTIVE' },
       getAuthHeaders()
@@ -112,7 +112,7 @@ function* fetchVendorDetailsSaga(action) {
   try {
     const config = yield call(getAuthHeaders);
     const response = yield call(
-      axiosInstance.get,
+      API_BASE_URL.get,
       `https://hastin-container.com/staging/api/vendor/${action.payload}`,
       {},
       config,
@@ -128,7 +128,7 @@ function* fetchCitiesSaga(action) {
   try {
     const config = yield call(getAuthHeaders);
     const response = yield call(
-      axiosInstance.post,
+      API_BASE_URL.post,
       fetch `https://hastin-container.com/staging/api/countryCities/get`,
       { country: action.payload }, 
       config,

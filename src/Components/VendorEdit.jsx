@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, data } from 'react-router-dom';
 import Select from 'react-select';
-import axios from 'axios';
+
 import { toast } from 'react-toastify';
 import './VendorEdit.css';
-import axiosInstance from './axiosInstance';
+import API_BASE_URL from './axiosInstance';
 
 const VendorEdit = () => {
   const { id } = useParams();
@@ -36,90 +36,107 @@ const VendorEdit = () => {
   const token = localStorage.getItem('authToken');
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('authToken');
+  const fetchData = async () => {
+    const token = localStorage.getItem('authToken');
 
-      const fetchCities = async (countryName) => {
-        try {
-          const response = await axios.post(
-            'https://hastin-container.com/staging/api/countryCities/get',
-            { country: countryName },
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `BslogiKey ${token}`,
-              },
-            }
-          );
-          const cityList = response.data?.data || [];
-          setCities(cityList.map(city => ({ label: city, value: city })));
-        } catch (err) {
-          console.error('City fetch error:', err);
-          toast.error('Failed to fetch cities');
-        }
-      };
-
+    const fetchCities = async (countryName) => {
       try {
-        const [countryRes, currencyRes] = await Promise.all([
-          axios.get('https://hastin-container.com/staging/api/meta/country'),
-          axios.get('https://hastin-container.com/staging/api/meta/currencies')
-        ]);
-
-        setCountries(countryRes.data.data.map(c => ({ value: c.name, label: c.name })));
-        setCurrencies(currencyRes.data.data.map(c => ({ value: c.name, label: c.name })));
-      } catch (error) {
-        toast.error('Error loading metadata');
-      }
-
-      if (id) {
-        try {
-          const response = await axiosInstance.get(
-            `https://hastin-container.com/staging/api/vendor/${id}`,
-            {},
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `BslogiKey ${token}`,
-              },
-            }
-          );
-
-          if (response.data?.data) {
-            const v = response.data.data;
-            setFormData({
-              vendorName: v.vendorName || '',
-              vendorCode: v.vendorCode || '',
-              vendorType: v.vendorType || '',
-              taxReg: v.taxRegistrationNo || '',
-              companyReg: v.companyRegistrationNo || '',
-              currency: v.defaultCurrency || '',
-              address1: v.address1 || '',
-              address2: v.address2 || '',
-              postalCode: v.postalCode || '',
-              country: v.country || '',
-              city: v.city || '',
-              accountName: v.accountName || '',
-              accountNumber: v.accountNumber || '',
-              bankName: v.bankName || '',
-              branch: v.branch || '',
-              swiftCode: v.swiftCode || ''
-            });
-            setContacts(v.contacts || []);
-            if (v.country) fetchCities(v.country);
+        const response = await API_BASE_URL.post(
+          '/countryCities/get',
+          { country: countryName },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `BslogiKey ${token}`,
+            },
           }
-        } catch (err) {
-          console.error('Failed to fetch vendor', err);
-          toast.error('Failed to fetch vendor details');
-        }
+        );
+        const cityList = response.data?.data || [];
+        setCities(cityList.map(city => ({ label: city, value: city })));
+      } catch (err) {
+        console.error('City fetch error:', err);
+        toast.error('Failed to fetch cities');
       }
     };
 
-    fetchData();
-  }, [id]);
+    try {
+      const [countryRes, currencyRes] = await Promise.all([
+        API_BASE_URL.get('/meta/country'),
+        API_BASE_URL.get('/meta/currencies')
+      ]);
+
+      setCountries(countryRes.data.data.map(c => ({ value: c.name, label: c.name })));
+
+      
+      const currencyList = currencyRes.data.data.map(c => ({
+        value: c.name,
+        label: c.name,
+        id: c.id
+      }));
+      setCurrencies(currencyList);
+      
+      const selected = currencyList.find(c => c.value === formData.currency);
+      if (selected) {
+        setFormData(prev => ({ ...prev, companyReg: String(selected.id) }));
+      }
+
+    } catch (error) {
+      toast.error('Error loading metadata');
+    }
+
+    if (id) {
+      try {
+        const response = await API_BASE_URL.get(
+          `https://hastin-container.com/staging/api/vendor/${id}`,
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `BslogiKey ${token}`,
+            },
+          }
+        );
+
+        if (response.data?.data) {
+          const v = response.data.data;
+         
+          setFormData({
+            vendorName: v.vendorName || '',
+            vendorCode: v.vendorCode || '',
+            vendorType: v.vendorType || '',
+            taxReg: v.taxRegistrationNo || '',
+            companyReg: v.companyRegistrationNo || '',
+            currency: v.defaultCurrency || '',
+            address1: v.address1 || '',
+            address2: v.address2 || '',
+            postalCode: v.postalCode || '',
+            country: v.country || '',
+            city: v.city || '',
+            accountName: v.accountName || '',
+            accountNumber: v.accountNumber || '',
+            bankName: v.bankName || '',
+            branch: v.branch || '',
+            swiftCode: v.swiftCode || ''
+          });
+          console.log(setFormData);
+          
+          setContacts(v.contacts || []);
+          if (v.country) fetchCities(v.country);
+        }
+      } catch (err) {
+        console.error('Failed to fetch vendor', err);
+        toast.error('Failed to fetch vendor details');
+      }
+    }
+  };
+
+  fetchData();
+}, [id]);
+
 
   const fetchCities = async (countryName) => {
     try {
-      const response = await axios.post(
+      const response = await API_BASE_URL.post(
         'https://hastin-container.com/staging/api/countryCities/get',
         { country: countryName },
         {
@@ -147,7 +164,7 @@ const VendorEdit = () => {
     e.preventDefault();
 
     try {
-      await axios.put(
+      await API_BASE_URL.put(
         `https://hastin-container.com/staging/api/vendor/update`,
         { id, ...formData, contacts },
         {
@@ -203,10 +220,14 @@ const VendorEdit = () => {
           <div className="form-group"><label>Company Reg. No</label><input value={formData.companyReg} onChange={e => handleChange('companyReg', e.target.value)} /></div>
           <div className="form-group"><label>Currency</label>
             <Select
-              options={currencies}
-              value={currencies.find(c => c.value === formData.currency)}
-              onChange={(opt) => handleChange('currency', opt.value)}
-            />
+  options={currencies}
+  value={currencies.find(c => c.value === formData.currency)}
+  onChange={(opt) => {
+    handleChange('currency', opt.value);
+    handleChange('companyReg', String(opt.id));
+  }}
+/>
+
           </div>
         </div>
 

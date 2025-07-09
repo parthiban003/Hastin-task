@@ -1,8 +1,8 @@
 
 import axios from 'axios';
 
-const axiosInstance = axios.create({
-  baseURL: 'https://hastin-container.com/staging/app',
+const API_BASE_URL = axios.create({
+  baseURL: 'https://hastin-container.com/staging/api',
   headers: {
     'Content-Type': 'application/json',
     'ApplicationLabel': 'demo',
@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
 });
 
 
-axiosInstance.interceptors.request.use(
+API_BASE_URL.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -21,4 +21,4 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-export default axiosInstance;
+export default API_BASE_URL;

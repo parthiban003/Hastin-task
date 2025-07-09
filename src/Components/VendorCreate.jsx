@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import Select from 'react-select';
 import 'react-toastify/dist/ReactToastify.css';
 import axiosInstance from './axiosInstance';
+import API_BASE_URL from './axiosInstance';
 
 const VendorCreate = () => {
   const navigate = useNavigate();
@@ -20,6 +21,34 @@ const VendorCreate = () => {
   const [currencies, setCurrencies] = useState([]);
   const [cities, setCities] = useState([]);
   const [errors, setErrors] = useState({});
+
+  const fetchCities = async (countryName) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await API_BASE_URL.post(
+      'https://hastin-container.com/staging/api/countryCities/get',
+      { country: countryName.trim() },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `BslogiKey ${token}`,
+        },
+      }
+    );
+
+    const cityList = response.data?.data || [];
+    setCities(cityList.map(city => ({ label: city, value: city })));
+  } catch (err) {
+    console.error('City fetch error:', err);
+    toast.error('Failed to fetch cities');
+  }
+};
+useEffect(() => {
+  if (formData.country) {
+    fetchCities(formData.country);
+  }
+}, [formData.country]);
+
 
   useEffect(() => {
     fetch('https://hastin-container.com/staging/api/meta/country')
@@ -42,25 +71,6 @@ const VendorCreate = () => {
   }, []);
 
 
- useEffect(() => {
-  const fetchCities = async () => {
-    try {
-      const response = await axiosInstance.post('/api/countryCities/get', {
-        country: formData.country,
-      });
-
-      const cityList = response.data?.data || [];
-      setCities(cityList.map(city => ({ value: city, label: city })));
-    } catch (err) {
-      console.error('City fetch error:', err);
-      setCities([]);
-    }
-  };
-
-  if (formData.country) {
-    fetchCities();
-  }
-}, [formData.country]);
 
 
   const handleInputChange = (e) => {
@@ -127,7 +137,7 @@ const VendorCreate = () => {
     };
 
     try {
-      const vendorResponse = await fetch('https://hastin-container.com/staging/api/vendor/create', {
+      const vendorResponse = await API_BASE_URL.fetch('/vendor/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +160,7 @@ const VendorCreate = () => {
           vendorId: vendorId
         }));
 
-        const contactResponse = await fetch('https://hastin-container.com/staging/api/vendor/contact/create', {
+        const contactResponse = await API_BASE_URL.fetch('/vendor/contact/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -208,7 +218,7 @@ const VendorCreate = () => {
             {errors.taxReg && <span className="error-text">{errors.taxReg}</span>}
           </div>
           <div className="form-group">
-            <label>Company Registration</label>
+            <label>Company Registration No</label>
             <input name="companyReg" value={formData.companyReg} onChange={handleInputChange} readOnly />
             {errors.companyReg && <span className="error-text">{errors.companyReg}</span>}
           </div>
@@ -227,7 +237,6 @@ const VendorCreate = () => {
             />
             {errors.currency && <span className="error-text">{errors.currency}</span>}
           </div>
-
         </div>
 
         <div className="card-section">

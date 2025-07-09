@@ -6,6 +6,7 @@ import pic1 from '../assets/pic1.avif';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AccessCodeModal from './AccessCodeModal';
+import API_BASE_URL from './axiosInstance';
 
 const LoginPage = () => {
   const [form, setForm] = useState({ username: '', password: '' });
@@ -45,7 +46,7 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const res = await axios.post(
+      const res = await API_BASE_URL.post(
         'https://hastin-container.com/staging/app/auth/login',
         {
           userName: form.username,
