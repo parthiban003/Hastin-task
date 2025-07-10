@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, data } from 'react-router-dom';
 import Select from 'react-select';
-
 import { toast } from 'react-toastify';
 import './VendorEdit.css';
 import API_BASE_URL from './axiosInstance';
@@ -18,115 +17,70 @@ const VendorEdit = () => {
     vendorName: '',
     vendorCode: '',
     vendorType: '',
-    taxReg: '',
-    companyReg: '',
-    currency: '',
+    taxRegNo: '',
+    companyRegNo: '',
+    defaultCurrencyId: '',
     address1: '',
     address2: '',
     postalCode: '',
     country: '',
     city: '',
-    accountName: '',
-    accountNumber: '',
+    bankAcctName: '',
+    bankAccountNum: '',
     bankName: '',
-    branch: '',
-    swiftCode: '',
+    bankBranchName: '',
+    bankSwiftCode: '',
   });
 
-  const token = localStorage.getItem('authToken');
+  
 
   useEffect(() => {
   const fetchData = async () => {
-    const token = localStorage.getItem('authToken');
-
-    const fetchCities = async (countryName) => {
-      try {
-        const response = await API_BASE_URL.post(
-          '/countryCities/get',
-          { country: countryName },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `BslogiKey ${token}`,
-            },
-          }
-        );
-        const cityList = response.data?.data || [];
-        setCities(cityList.map(city => ({ label: city, value: city })));
-      } catch (err) {
-        console.error('City fetch error:', err);
-        toast.error('Failed to fetch cities');
-      }
-    };
-
     try {
       const [countryRes, currencyRes] = await Promise.all([
         API_BASE_URL.get('/meta/country'),
         API_BASE_URL.get('/meta/currencies')
       ]);
 
-      setCountries(countryRes.data.data.map(c => ({ value: c.name, label: c.name })));
-
-      
+      const countryList = countryRes.data.data.map(c => ({ value: c.name, label: c.name }));
       const currencyList = currencyRes.data.data.map(c => ({
         value: c.name,
         label: c.name,
         id: c.id
       }));
+
+      setCountries(countryList);
       setCurrencies(currencyList);
-      
-      const selected = currencyList.find(c => c.value === formData.currency);
-      if (selected) {
-        setFormData(prev => ({ ...prev, companyReg: String(selected.id) }));
-      }
 
-    } catch (error) {
-      toast.error('Error loading metadata');
-    }
-
-    if (id) {
-      try {
-        const response = await API_BASE_URL.get(
-          `https://hastin-container.com/staging/api/vendor/${id}`,
-          {},
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `BslogiKey ${token}`,
-            },
-          }
-        );
-
-        if (response.data?.data) {
-          const v = response.data.data;
-         
+      if (id) {
+        const response = await API_BASE_URL.get(`/vendor/get/${id}`);
+        const v = response.data?.data;
+        if (v) {
           setFormData({
             vendorName: v.vendorName || '',
             vendorCode: v.vendorCode || '',
             vendorType: v.vendorType || '',
-            taxReg: v.taxRegistrationNo || '',
-            companyReg: v.companyRegistrationNo || '',
-            currency: v.defaultCurrency || '',
+            taxRegNo: v.taxRegNo || '',
+            companyRegNo: v.companyRegNo || '',
+            defaultCurrencyId: v.defaultCurrencyId || '',
             address1: v.address1 || '',
             address2: v.address2 || '',
             postalCode: v.postalCode || '',
             country: v.country || '',
             city: v.city || '',
-            accountName: v.accountName || '',
-            accountNumber: v.accountNumber || '',
+            bankAcctName: v.bankAcctName || '',
+            bankAccountNum: v.bankAccountNum || '',
             bankName: v.bankName || '',
-            branch: v.branch || '',
-            swiftCode: v.swiftCode || ''
+            bankBranchName: v.bankBranchName || '',
+            bankSwiftCode: v.bankSwiftCode || ''
           });
-          console.log(setFormData);
-          
           setContacts(v.contacts || []);
           if (v.country) fetchCities(v.country);
         }
-      } catch (err) {
-        console.error('Failed to fetch vendor', err);
-        toast.error('Failed to fetch vendor details');
       }
+    } catch (error) {
+      toast.error('Error loading vendor or metadata');
+      console.error(error);
     }
   };
 
@@ -134,24 +88,19 @@ const VendorEdit = () => {
 }, [id]);
 
 
+
   const fetchCities = async (countryName) => {
-    try {
-      const response = await API_BASE_URL.post(
-        'https://hastin-container.com/staging/api/countryCities/get',
-        { country: countryName },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `BslogiKey ${token}`,
-          },
-        }
-      );
-      const cityList = response.data?.data || [];
-      setCities(cityList.map(city => ({ label: city, value: city })));
-    } catch (err) {
-      console.error('City fetch error:', err);
-    }
-  };
+  try {
+    const response = await API_BASE_URL.get('/countryCities/get', { country: countryName });
+
+    const cityList = response.data?.data || [];
+    setCities(cityList?.filter(data => data.countryName === countryName)?.map(city => ({ label: city.name, value: city.name })) || []);
+  } catch (err) {
+    console.error('City fetch error:', err);
+    toast.error('Failed to fetch cities');
+  }
+};
+
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -160,27 +109,32 @@ const VendorEdit = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      await API_BASE_URL.put(
-        `https://hastin-container.com/staging/api/vendor/update`,
-        { id, ...formData, contacts },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `BslogiKey ${token}`
-          }
-        }
-      );
+  try {
+    const payload = {
+      id,
+      ...formData,
+      contacts
+    };
 
+    const response = await API_BASE_URL.put(
+      '/vendor/update',
+      payload
+    );
+
+    if (response.status === 200) {
       toast.success('Vendor updated successfully');
-      navigate('/dashboard');
-    } catch (err) {
+    } else {
       toast.error('Failed to update vendor');
     }
-  };
+  } catch (err) {
+    console.error('Update error:', err);
+    toast.error('Error occurred while updating vendor');
+  }
+};
+
 
   const addContact = () => {
     setContacts([...contacts, { name: '', email: '', phone: '', isDefault: false }]);
@@ -188,21 +142,41 @@ const VendorEdit = () => {
 
   const updateContact = (index, field, value) => {
     const updated = [...contacts];
+    console.log(contacts)
     updated[index][field] = value;
     setContacts(updated);
   };
 
-  const deleteContact = (index) => {
+  const deleteContact = async (index, contactId) => {
+  if (!contactId) {
+    
     const updated = [...contacts];
     updated.splice(index, 1);
     setContacts(updated);
-  };
+    return;
+  }
 
+  try {
+    const res = await API_BASE_URL.post('/vendor/contact/delete', {
+      id: contactId
+    });
+
+    if (res.status === 200) {
+      toast.success('Contact deleted successfully');
+      const updated = [...contacts];
+      updated.splice(index, 1);
+      setContacts(updated);
+    } else {
+      toast.error('Failed to delete contact');
+    }
+  } catch (err) {
+    console.error('Delete error:', err);
+  }
+};
   return (
     <div className="edit-vendor-container">
       <div className='header'>
         <h2>Edit Vendor</h2>
-       
       </div><br />
       <form className="edit-vendor-form" onSubmit={handleSubmit}>
         <div className="card-section">
@@ -216,18 +190,14 @@ const VendorEdit = () => {
               <option>Individual</option>
             </select>
           </div>
-          <div className="form-group"><label>Tax Reg. No</label><input value={formData.taxReg} onChange={e => handleChange('taxReg', e.target.value)} /></div>
-          <div className="form-group"><label>Company Reg. No</label><input value={formData.companyReg} onChange={e => handleChange('companyReg', e.target.value)} /></div>
+          <div className="form-group"><label>Tax Reg. No</label><input value={formData.taxRegNo} onChange={e => handleChange('taxReg', e.target.value)} /></div>
+          <div className="form-group"><label>Company Reg No</label><input value={formData.companyRegNo} onChange={e => handleChange('companyReg', e.target.value)} /></div>
           <div className="form-group"><label>Currency</label>
-            <Select
-  options={currencies}
-  value={currencies.find(c => c.value === formData.currency)}
-  onChange={(opt) => {
-    handleChange('currency', opt.value);
-    handleChange('companyReg', String(opt.id));
-  }}
-/>
-
+           <Select
+              options={currencies}
+              value={currencies.find(c => c.value === formData.defaultCurrencyId)}
+              onChange={(opt) => handleChange('currency', opt.target.value)} 
+            />
           </div>
         </div>
 
@@ -240,9 +210,9 @@ const VendorEdit = () => {
             <Select
               options={countries}
               value={countries.find(c => c.value === formData.country)}
-              onChange={(opt) => {
-                handleChange('country', opt.value);
-                fetchCities(opt.value);
+              onChange={(e) => {
+                handleChange('country', e.target.value);
+                fetchCities(e.target.value);
                 handleChange('city', '');
               }}
             />
@@ -251,7 +221,7 @@ const VendorEdit = () => {
             <Select
               options={cities}
               value={cities.find(c => c.value === formData.city)}
-              onChange={(opt) => handleChange('city', opt.value)}
+              onChange={(e) => handleChange('city', e.target.value)}
             />
           </div>
         </div>
@@ -259,11 +229,11 @@ const VendorEdit = () => {
         <div className="card-section">
           
           <h5>Bank Info</h5>
-          <div className="form-group"><label>Account Name</label><input value={formData.accountName} onChange={e => handleChange('accountName', e.target.value)} /></div>
-          <div className="form-group"><label>Account Number</label><input value={formData.accountNumber} onChange={e => handleChange('accountNumber', e.target.value)} /></div>
+          <div className="form-group"><label>Account Name</label><input value={formData.bankAcctName} onChange={e => handleChange('accountName', e.target.value)} /></div>
+          <div className="form-group"><label>Account Number</label><input value={formData.bankAccountNum} onChange={e => handleChange('accountNumber', e.target.value)} /></div>
           <div className="form-group"><label>Bank Name</label><input value={formData.bankName} onChange={e => handleChange('bankName', e.target.value)} /></div>
-          <div className="form-group"><label>Branch</label><input value={formData.branch} onChange={e => handleChange('branch', e.target.value)} /></div>
-          <div className="form-group"><label>SWIFT Code</label><input value={formData.swiftCode} onChange={e => handleChange('swiftCode', e.target.value)} /></div>
+          <div className="form-group"><label>Branch</label><input value={formData.bankBranchName} onChange={e => handleChange('branch', e.target.value)} /></div>
+          <div className="form-group"><label>SWIFT Code</label><input value={formData.bankSwiftCode} onChange={e => handleChange('swiftCode', e.target.value)} /></div>
         </div>
 
         <div className="contact-section">
@@ -285,7 +255,7 @@ const VendorEdit = () => {
                   <td>{index + 1}</td>
                   <td><input placeholder='Name' value={contact.name} onChange={(e) => updateContact(index, 'name', e.target.value)} /></td>
                   <td><input placeholder='E-mail' value={contact.email} onChange={(e) => updateContact(index, 'email', e.target.value)} /></td>
-                  <td><input placeholder='Phone' value={contact.phone} onChange={(e) => updateContact(index, 'phone', e.target.value)} /></td>
+                  <td><input placeholder='Phone' value={contact.mobileNo} onChange={(e) => updateContact(index, 'phone', e.target.value)} /></td>
                   <td>
                     <select
                       value={contact.isDefault ? 'YES' : 'NO'}
@@ -296,7 +266,7 @@ const VendorEdit = () => {
                     </select>
                   </td>
                   <td>
-                <button className='btn-delete' type="button" onClick={() => deleteContact(index)}>Delete</button>
+                <button className='btn-delete' type="button"  onClick={() => deleteContact(index, contact.id)}>Delete</button>
                   </td>
                 </tr>
               ))}
@@ -304,13 +274,14 @@ const VendorEdit = () => {
           </table>
           <button type="button" className="btn-add mt-2" onClick={addContact}>+ Add Contact</button>
         </div>
-      </form>
-      <br />
-       <button type="submit" className="btn btn-submit">Update Vendor</button>
-       <button type="button" className="btn btn-back" onClick={() => {
+        <div className="edit-vendor-form" >
+         <button type="submit" className="btn btn-submit">Update Vendor</button>
+         <button type="button" className="btn btn-back" onClick={() => {
             navigate('/dashboard');
             toast.success('Fetched to Vendors')
           }}> Back</button>
+      </div>
+      </form>
     </div>
   );
 };

@@ -90,7 +90,7 @@
   justify-content: space-between;
 }
 .btn-back {
-  background-color: #b0bec5;
+  background-color: #7d868a;
   color: #fffcfc;
   height: 40px;
   margin-left: 3%;
@@ -182,7 +182,7 @@ input::-webkit-outer-spin-button {
 }
 
 .btn-add {
-  background-color: #2149a0;
+  background-color: #1043b1;
   color: white;
   padding: 8px 16px;
   border: none;
@@ -239,7 +239,12 @@ input::-webkit-outer-spin-button {
   .card-section {
     min-width: 100%;
   }
+   .btn-back,
+  .btn-submit {
+    width: 25%;
+  }
 }
+
 
 @media (max-width: 768px) {
   .contact-table th,

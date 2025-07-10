@@ -1,5 +1,4 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
-import axios from 'axios';
 import * as types from './vendorTypes';
 
 import {
@@ -19,16 +18,6 @@ import { toast } from 'react-toastify';
 import API_BASE_URL from '../../Components/axiosInstance';
 
 
-function getAuthHeaders() {
-  const token = localStorage.getItem('authToken');
-  if (!token) throw new Error("Auth token not found in localStorage");
-  return {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `BslogiKey ${token}`,
-    },
-  };
-}
 
 function* fetchActiveVendorsSaga() {
   try {
@@ -36,12 +25,12 @@ function* fetchActiveVendorsSaga() {
       pagination: { index: 1, rowCount: -1, searchObj: null, sortingObj: null },
     };
 
-    const config = yield call(getAuthHeaders);
+    
     const response = yield call(
-      axios.put,
-      'https://hastin-container.com/staging/api/vendor/search/active',
+      API_BASE_URL.put,
+      '/vendor/search/active',
       payload,
-      config
+      
     );
     yield put(fetchSuccess(response.data?.data?.tableData || []));
   } catch (error) {
@@ -54,12 +43,12 @@ function* fetchInactiveVendorsSaga() {
       pagination: { index: 1, rowCount: -1, searchObj: null, sortingObj: null }
     };
 
-    const config = yield call(getAuthHeaders);
+   
     const response = yield call(
-      axios.put,
-      'https://hastin-container.com/staging/api/vendor/search/inactive',
+      API_BASE_URL.put,
+      '/vendor/search/inactive',
       payload,
-      config
+     
     );
 
     console.log("Inactive vendors response:", response.data?.data);
@@ -76,11 +65,13 @@ function* markInactiveSaga(action) {
     
     const res = yield call(
       API_BASE_URL.put,
-      'https://hastin-container.com/staging/api/vendor/status/update',
+      '/vendor/status/update',
       { vendorId: action.payload, status: 'INACTIVE' },
-      getAuthHeaders()
+      
     );
-    yield put(vendorUpdateRequest(res.data?.data?.tableData || []));
+    console.log(res.data?.data);
+    
+    yield put(vendorUpdateRequest(res.data?.data?.tableData));
     toast.success('Successfully mark as Inactive')
   } catch (error) {
     toast.error('Failed to mark Inactive')
@@ -90,14 +81,15 @@ function* markInactiveSaga(action) {
 
 function* markActiveSaga(action) {
   try {
-    yield call(
+     const val = yield call(
       API_BASE_URL.put,
-      'https://hastin-container.com/staging/api/vendor/status/update',
+      '/vendor/status/update',
       { vendorId: action.payload, status: 'ACTIVE' },
-      getAuthHeaders()
+      
     );
+    console.log(val.data?.data)
 
-    
+    yield put (vendorUpdateRequest(val.data?.data.tableData))
     yield put({ type: types.VENDOR_UPDATE_REQUEST });
     yield put({ type: types.FETCH_INACTIVE_REQUEST });
     toast.success('Successfully mark as Active')
@@ -110,12 +102,12 @@ function* markActiveSaga(action) {
 
 function* fetchVendorDetailsSaga(action) {
   try {
-    const config = yield call(getAuthHeaders);
+    
     const response = yield call(
       API_BASE_URL.get,
-      `https://hastin-container.com/staging/api/vendor/${action.payload}`,
+      `/vendor/${action.payload}`,
       {},
-      config,
+     
     );
     yield put(fetchVendorDetailsSuccess(response.data?.data || []));
   } catch (error) {
@@ -126,14 +118,14 @@ function* fetchVendorDetailsSaga(action) {
 
 function* fetchCitiesSaga(action) {
   try {
-    const config = yield call(getAuthHeaders);
+   
     const response = yield call(
-      API_BASE_URL.post,
-      fetch `https://hastin-container.com/staging/api/countryCities/get`,
+      API_BASE_URL.get,
+       `/countryCities/get`,
       { country: action.payload }, 
-      config,
+     
     );
-    yield put(fetchCitiesSuccess(response.data?.data));
+    yield put(fetchCitiesSuccess(response.data?.data || []));
   } catch (error) {
     yield put(fetchCitiesFailure(error?.response?.data?.message || error.message));
   }

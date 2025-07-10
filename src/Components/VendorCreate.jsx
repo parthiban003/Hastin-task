@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Select from 'react-select';
 import 'react-toastify/dist/ReactToastify.css';
-import axiosInstance from './axiosInstance';
 import API_BASE_URL from './axiosInstance';
 
 const VendorCreate = () => {
@@ -11,9 +10,9 @@ const VendorCreate = () => {
 
   const [formData, setFormData] = useState({
     vendorName: '', vendorCode: '', vendorType: '',
-    taxReg: '', companyReg: '', currency: '',
+    taxRegNo: '', companyRegNo: '', defaultCurrency: '',
     address1: '', address2: '', postalCode: '', country: '', city: '',
-    accountName: '', accountNumber: '', bankName: '', branch: '', swiftCode: ''
+    bankAcctName: '', bankAccountNum: '', bankName: '', bankBranchName: '', bankSwiftCode: ''
   });
 
   const [contacts, setContacts] = useState([{ name: '', email: '', mobile: '' }]);
@@ -24,25 +23,21 @@ const VendorCreate = () => {
 
   const fetchCities = async (countryName) => {
   try {
-    const token = localStorage.getItem('authToken');
-    const response = await API_BASE_URL.post(
-      'https://hastin-container.com/staging/api/countryCities/get',
+   
+    const response = await API_BASE_URL.get(
+      '/countryCities/get',
       { country: countryName.trim() },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `BslogiKey ${token}`,
-        },
-      }
+      
     );
 
-    const cityList = response.data?.data || [];
-    setCities(cityList.map(city => ({ label: city, value: city })));
+    const cityList = response?.data?.data || [];
+    setCities(cityList?.filter( data => data.countryName === countryName )?.map(city => ({ label: city.name, value: city.name })) || []);
   } catch (err) {
     console.error('City fetch error:', err);
     toast.error('Failed to fetch cities');
   }
 };
+
 useEffect(() => {
   if (formData.country) {
     fetchCities(formData.country);
@@ -70,7 +65,7 @@ useEffect(() => {
       );
   }, []);
 
-
+ 
 
 
   const handleInputChange = (e) => {
@@ -100,11 +95,10 @@ useEffect(() => {
   };
 
   const handleSubmit = async () => {
-    const token = localStorage.getItem('authToken');
     const newErrors = {};
 
     Object.entries(formData).forEach(([key, value]) => {
-      if (!value) newErrors[key] = 'required';
+      if (!value) newErrors[key] = 'Required';
       contacts.forEach((c, i) => {
         if (!c.name || !c.email || !c.mobile) {
           newErrors[`contact-${i}`] = 'All contact fields are required';
@@ -121,36 +115,30 @@ useEffect(() => {
       vendorName: formData.vendorName,
       vendorCode: formData.vendorCode,
       vendorType: formData.vendorType,
-      taxRegistrationNo: formData.taxReg,
-      companyRegistrationNo: formData.companyReg,
-      defaultCurrency: formData.currency,
+      taxRegNo: formData.taxRegNo,
+      companyRegNo: formData.companyRegNo,
+      defaultCurrency: formData.defaultCurrency,
       address1: formData.address1,
       address2: formData.address2,
       postalCode: formData.postalCode,
       country: formData.country,
       city: formData.city,
-      accountName: formData.accountName,
-      accountNumber: formData.accountNumber,
+      bankAcctName: formData.bankAcctName,
+      bankAccountNum: formData.bankAccountNum,
       bankName: formData.bankName,
-      branch: formData.branch,
-      swiftCode: formData.swiftCode,
+      bankBranchName: formData.bankBranchName,
+      bankSwiftCode: formData.bankSwiftCode,
     };
 
     try {
-      const vendorResponse = await API_BASE_URL.fetch('/vendor/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `BslogiKey ${token}`
-        },
+      const vendorResponse = await API_BASE_URL.post('/vendor/create', {
+        
         body: JSON.stringify(vendorPayload)
       });
 
       const vendorData = await vendorResponse.json();
-
       if (vendorData?.data?.id) {
         const vendorId = vendorData.data.id;
-
 
         const contactsPayload = contacts.map((c) => ({
           name: c.name,
@@ -160,12 +148,7 @@ useEffect(() => {
           vendorId: vendorId
         }));
 
-        const contactResponse = await API_BASE_URL.fetch('/vendor/contact/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `BslogiKey ${token}`
-          },
+        const contactResponse = await API_BASE_URL.post('/vendor/contact/create', {
           body: JSON.stringify(contactsPayload)
         });
 
@@ -184,14 +167,14 @@ useEffect(() => {
       }
     } catch (error) {
       console.error('Error:', error);
-      toast.error('An error occurred while creating vendor.');
     }
   };
 
   return (
+
     <div className="edit-vendor-container">
       <h2>Create New Vendor</h2>
-      <div className="edit-vendor-form">
+      <form className="edit-vendor-form" onSubmit={handleSubmit}>
         <div className="card-section">
           <h5>Vendor Details</h5>
           <div className="form-group">
@@ -214,13 +197,13 @@ useEffect(() => {
           </div>
           <div className="form-group">
             <label>Tax Registration</label>
-            <input name="taxReg" value={formData.taxReg} onChange={handleInputChange} />
-            {errors.taxReg && <span className="error-text">{errors.taxReg}</span>}
+            <input name="taxRegNo" value={formData.taxRegNo} onChange={handleInputChange} />
+            {errors.taxRegNo && <span className="error-text">{errors.taxRegNo}</span>}
           </div>
           <div className="form-group">
             <label>Company Registration No</label>
-            <input name="companyReg" value={formData.companyReg} onChange={handleInputChange} readOnly />
-            {errors.companyReg && <span className="error-text">{errors.companyReg}</span>}
+            <input name="companyReg" value={formData.companyRegNo} onChange={handleInputChange} readOnly />
+            {errors.companyRegNo && <span className="error-text">{errors.companyRegNo}</span>}
           </div>
           <div className="form-group">
             <label>Currency</label>
@@ -231,7 +214,7 @@ useEffect(() => {
                 setFormData(prev => ({
                   ...prev,
                   currency: opt.value,
-                  companyReg: opt.fullData.id
+                  companyRegNo: opt.fullData.id
                 }));
               }}
             />
@@ -280,28 +263,23 @@ useEffect(() => {
           <h5>Bank Info</h5>
           <div className="form-group">
             <label>Account Name</label>
-            <input name="accountName" value={formData.accountName} onChange={handleInputChange} />
-            {errors.accountName && <span className="error-text">{errors.accountName}</span>}
+            <input name="bankAcctName" value={formData.bankAcctName} onChange={handleInputChange} />
           </div>
           <div className="form-group">
             <label>Account Number</label>
-            <input name="accountNumber" type="number" value={formData.accountNumber} onChange={handleInputChange} />
-            {errors.accountNumber && <span className="error-text">{errors.accountNumber}</span>}
+            <input name="bankAccountNum" type="number" value={formData.bankAccountNum} onChange={handleInputChange} />
           </div>
           <div className="form-group">
             <label>Bank Name</label>
             <input name="bankName" value={formData.bankName} onChange={handleInputChange} />
-            {errors.bankName && <span className="error-text">{errors.bankName}</span>}
           </div>
           <div className="form-group">
             <label>Branch</label>
-            <input name="branch" value={formData.branch} onChange={handleInputChange} />
-            {errors.branch && <span className="error-text">{errors.branch}</span>}
+            <input name="bankBranchName" value={formData.bankBranchName} onChange={handleInputChange} />
           </div>
           <div className="form-group">
             <label>SWIFT Code</label>
-            <input name="swiftCode" value={formData.swiftCode} onChange={handleInputChange} />
-            {errors.swiftCode && <span className="error-text">{errors.swiftCode}</span>}
+            <input name="bankSwiftCode" value={formData.bankSwiftCode} onChange={handleInputChange} />
           </div>
         </div>
 
@@ -326,9 +304,11 @@ useEffect(() => {
           </table>
           <button className='btn-add' type="button" onClick={addContact}> + Add Contact</button>
         </div>
-      </div><br />
-      <button className="btn btn-submit" type="button" onClick={handleSubmit}>Create Vendor</button>
-      <button className="btn btn-back" type="button" onClick={() => { navigate('/dashboard'); toast.info('Fetched to Vendors Screen'); }}>Cancel</button>
+         <div className='edit-vendor-form'>
+        <button className="btn btn-submit" type="submit">Create Vendor</button>
+       <button className="btn btn-back" type="button" onClick={() => { navigate('/dashboard'); toast.info('Fetched to Vendors Screen'); }}>Cancel</button>
+       </div>
+      </form>
     </div>
   );
 };

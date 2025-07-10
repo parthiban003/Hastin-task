@@ -201,7 +201,7 @@ const VendorDashboard = () => {
                               setActionMenu(null);
                             }}
                           >
-                            <FontAwesomeIcon icon={faCircle} color="red" />
+                            <FontAwesomeIcon icon={faCircle} color= {vendor.status === 'ACTIVE' ? 'red' : 'green'} />
                             {vendor.status === 'ACTIVE' ? 'Mark Inactive' : 'Mark Active'}
                           </button>
                         </div>
