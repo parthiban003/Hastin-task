@@ -13,6 +13,8 @@ import {
   fetchVendorDetailsFailure,
   fetchCitiesSuccess,
   fetchCitiesFailure,
+  updateVendorStatusSuccess,
+  updateVendorStatusFailure,
 } from './vendorSlice';
 import { toast } from 'react-toastify';
 import API_BASE_URL from '../../Components/axiosInstance';
@@ -62,43 +64,45 @@ function* fetchInactiveVendorsSaga() {
 
 function* markInactiveSaga(action) {
   try {
-    
+    const vendorId = action.payload;
+
     const res = yield call(
       API_BASE_URL.put,
-      '/vendor/status/update',
-      { vendorId: action.payload, status: 'INACTIVE' },
-      
+      `/vendor/inactive/${vendorId}`
     );
-    console.log(res.data?.data);
+
+    yield put(updateVendorStatusSuccess({ id: vendorId, status: 'INACTIVE' }));
+    yield put({ type: types.FETCH_INACTIVE_REQUEST });
+    yield put({ type: types.VENDOR_UPDATE_REQUEST });
+
     
-    yield put(vendorUpdateRequest(res.data?.data?.tableData));
-    toast.success('Successfully mark as Inactive')
   } catch (error) {
-    toast.error('Failed to mark Inactive')
-    console.error('Error marking inactive:', error.message);
+    yield put(updateVendorStatusFailure(error.message));
+    
   }
 }
+
 
 function* markActiveSaga(action) {
   try {
-     const val = yield call(
+    const vendorId = action.payload;
+
+    const res = yield call(
       API_BASE_URL.put,
-      '/vendor/status/update',
-      { vendorId: action.payload, status: 'ACTIVE' },
-      
+      `/vendor/active/${vendorId}`
     );
-    console.log(val.data?.data)
 
-    yield put (vendorUpdateRequest(val.data?.data.tableData))
-    yield put({ type: types.VENDOR_UPDATE_REQUEST });
+    yield put(updateVendorStatusSuccess({ id: vendorId, status: 'ACTIVE' }));
     yield put({ type: types.FETCH_INACTIVE_REQUEST });
-    toast.success('Successfully mark as Active')
+    yield put({ type: types.VENDOR_UPDATE_REQUEST });
 
+    
   } catch (error) {
-    toast.error('Failed to mark active')
-    console.error('Error marking active:', error.message);
+    yield put(updateVendorStatusFailure(error.message));
+    
   }
 }
+
 
 function* fetchVendorDetailsSaga(action) {
   try {

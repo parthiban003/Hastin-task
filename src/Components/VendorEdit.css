@@ -93,7 +93,6 @@
   background-color: #7d868a;
   color: #fffcfc;
   height: 40px;
-  margin-left: 3%;
   font-weight: 500;
 }
 
@@ -106,11 +105,17 @@
   font-size: 12px;
   margin-top: 4px;
 }
+.submit-form {
+  display: flex;
+  align-items: end;
+  margin-top: 5%;
+  gap: 1rem;
+  
+}
 
 .btn-submit {
   background-color: #1043b1;
   color: white;
-  margin-left: 3%;
   font-weight: 500;
 }
 
@@ -133,12 +138,12 @@
   z-index: 1000;
 }
 .contact-section {
-  background-color: #fff;
+ background-color: #fff;
   padding: 1.5rem;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   flex: 1;
-  min-width: 360px;
+  width: 260px;
   max-width: 100%;
 }
 
@@ -231,7 +236,7 @@ input::-webkit-outer-spin-button {
   background-color: #b71c1c;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1124px) {
   .edit-vendor-form {
     flex-direction: column;
   }
@@ -239,10 +244,10 @@ input::-webkit-outer-spin-button {
   .card-section {
     min-width: 100%;
   }
-   .btn-back,
-  .btn-submit {
-    width: 25%;
+  .contact-section{
+    min-width: 100%;
   }
+   
 }
 
 

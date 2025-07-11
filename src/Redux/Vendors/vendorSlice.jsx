@@ -12,8 +12,7 @@ const vendorSlice = createSlice({
   },
 
   reducers: {
-    
-    vendorUpdateRequest: (state) => {
+    vendorUpdateRequest: (state, action) => {
       state.loading = true;
     },
     fetchSuccess: (state, action) => {
@@ -42,9 +41,24 @@ const vendorSlice = createSlice({
     markActiveRequest: () => {},
 
     
+    updateVendorStatusSuccess: (state, action) => {
+      const { id, status } = action.payload;
+
+      if (status === 'INACTIVE') {
+       
+        state.vendors = state.vendors.filter(v => v.id !== id);
+      } else if (status === 'ACTIVE') {
+        
+        state.inactiveVendors = state.inactiveVendors.filter(v => v.id !== id);
+      }
+    },
+    updateVendorStatusFailure: (state, action) => {
+      state.error = action.payload;
+    },
+
     fetchVendorDetailsSuccess: (state, action) => {
       state.selectedVendor = action.payload;
-       state.loading = false;
+      state.loading = false;
     },
     fetchVendorDetailsFailure: (state, action) => {
       state.selectedVendor = null;
@@ -52,7 +66,6 @@ const vendorSlice = createSlice({
       state.error = action.payload;
     },
 
-    
     fetchCitiesSuccess: (state, action) => {
       state.cities = action.payload;
     },
@@ -71,6 +84,9 @@ export const {
   fetchInactiveFailure,
   markInactiveRequest,
   markActiveRequest,
+
+  updateVendorStatusSuccess,      
+  updateVendorStatusFailure,      
 
   fetchVendorDetailsSuccess,
   fetchVendorDetailsFailure,

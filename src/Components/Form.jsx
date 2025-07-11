@@ -120,7 +120,7 @@ const LoginPage = () => {
           </label>
 
           <br />
-          <a href="/" className="forgot-link">🔒 Forgot password?</a><br /><br />
+          <a href="/" className="forgot-link" title='forget password?'>🔒 Forgot password?</a><br /><br />
 
           <button type="submit" className="login-btn" disabled={isLoading}>
             {isLoading ? <Loader size="md" /> : 'Login'}

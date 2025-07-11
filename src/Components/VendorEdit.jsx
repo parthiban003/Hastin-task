@@ -33,7 +33,6 @@ const VendorEdit = () => {
   });
 
   
-
   useEffect(() => {
   const fetchData = async () => {
     try {
@@ -55,27 +54,39 @@ const VendorEdit = () => {
       if (id) {
         const response = await API_BASE_URL.get(`/vendor/get/${id}`);
         const v = response.data?.data;
+
         if (v) {
+          if (v.country) {
+            await fetchCities(v.country); 
+          }
+
           setFormData({
             vendorName: v.vendorName || '',
             vendorCode: v.vendorCode || '',
             vendorType: v.vendorType || '',
             taxRegNo: v.taxRegNo || '',
             companyRegNo: v.companyRegNo || '',
-            defaultCurrencyId: v.defaultCurrencyId || '',
+            defaultCurrencyId: currencyList.find(c => c.label === v.defaultCurrency)?.value || '',
             address1: v.address1 || '',
             address2: v.address2 || '',
             postalCode: v.postalCode || '',
             country: v.country || '',
-            city: v.city || '',
+            city: v.city || '', 
             bankAcctName: v.bankAcctName || '',
             bankAccountNum: v.bankAccountNum || '',
             bankName: v.bankName || '',
             bankBranchName: v.bankBranchName || '',
             bankSwiftCode: v.bankSwiftCode || ''
           });
-          setContacts(v.contacts || []);
-          if (v.country) fetchCities(v.country);
+
+          
+          setContacts(Array.isArray(v.contacts) ? v.contacts.map(c => ({
+            id: c.id || '',
+            name: c.name || '',
+            email: c.email || '',
+            phone: c.phone || '',
+            isDefault: c.isDefault || false
+          })) : []);
         }
       }
     } catch (error) {
@@ -86,6 +97,7 @@ const VendorEdit = () => {
 
   fetchData();
 }, [id]);
+
 
 
 
@@ -100,7 +112,6 @@ const VendorEdit = () => {
     toast.error('Failed to fetch cities');
   }
 };
-
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -195,8 +206,8 @@ const VendorEdit = () => {
           <div className="form-group"><label>Currency</label>
            <Select
               options={currencies}
-              value={currencies.find(c => c.value === formData.defaultCurrencyId)}
-              onChange={(opt) => handleChange('currency', opt.target.value)} 
+              value={currencies.filter(c => c.value === formData.defaultCurrencyId)}
+              onChange={(opt) => handleChange('defaultCurrencyId', opt.value)}
             />
           </div>
         </div>
@@ -210,9 +221,9 @@ const VendorEdit = () => {
             <Select
               options={countries}
               value={countries.find(c => c.value === formData.country)}
-              onChange={(e) => {
-                handleChange('country', e.target.value);
-                fetchCities(e.target.value);
+              onChange={(opt) => {
+                handleChange('country', opt.value);
+                fetchCities(opt.value);
                 handleChange('city', '');
               }}
             />
@@ -236,7 +247,7 @@ const VendorEdit = () => {
           <div className="form-group"><label>SWIFT Code</label><input value={formData.bankSwiftCode} onChange={e => handleChange('swiftCode', e.target.value)} /></div>
         </div>
 
-        <div className="contact-section">
+        <div className="card-section">
           <h5>Contact Info</h5>
           <table className="contact-table">
             <thead>
@@ -274,7 +285,7 @@ const VendorEdit = () => {
           </table>
           <button type="button" className="btn-add mt-2" onClick={addContact}>+ Add Contact</button>
         </div>
-        <div className="edit-vendor-form" >
+        <div className="submit-form" >
          <button type="submit" className="btn btn-submit">Update Vendor</button>
          <button type="button" className="btn btn-back" onClick={() => {
             navigate('/dashboard');
