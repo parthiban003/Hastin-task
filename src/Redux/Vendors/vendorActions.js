@@ -11,3 +11,18 @@ export const fetchInactiveFailure = (error) => ({ type: types.FETCH_INACTIVE_FAI
 export const markInactiveRequest = (vendorId) => ({ type: types.MARK_INACTIVE_REQUEST, payload: vendorId });
 export const markActiveRequest = (vendorId) => ({ type: types.MARK_ACTIVE_REQUEST, payload: vendorId });
 
+
+export const createVendorRequest = (payload) => ({
+  type: types.CREATE_VENDOR_REQUEST,
+  payload, 
+});
+
+export const createVendorSuccess = (data) => ({
+  type: types.CREATE_VENDOR_SUCCESS,
+  payload: data,
+});
+
+export const createVendorFailure = (error) => ({
+  type: types.CREATE_VENDOR_FAILURE,
+  payload: error,
+});

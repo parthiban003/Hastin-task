@@ -6,19 +6,19 @@ import * as Yup from 'yup';
 import Select from 'react-select';
 import { useDispatch } from 'react-redux';
 import API_BASE_URL from './axiosInstance';
-import { createVendorRequest } from '../Redux/Vendors/vendorActions';
+import { CREATE_VENDOR_REQUEST } from '../Redux/Vendors/vendorTypes';
+import { createVendorRequest, createVendorSuccess } from '../Redux/Vendors/vendorActions';
 
 const VendorCreate = () => {
   const navigate = useNavigate();
   const [countries, setCountries] = useState([]);
   const [currencies, setCurrencies] = useState([]);
   const [cities, setCities] = useState([]);
-  const [allCityData, setAllCityData] = useState([]);
 
   useEffect(() => {
     fetch('https://hastin-container.com/staging/api/meta/country')
       .then(res => res.json())
-      .then(data => setCountries(data?.data?.map(c => ({ value: c.id, label: c.name })) || []));
+      .then(data => setCountries(data?.data?.map(c => ({ value: c.name, label: c.name })) || []));
 
     fetch('https://hastin-container.com/staging/api/meta/currencies')
       .then(res => res.json())
@@ -27,12 +27,11 @@ const VendorCreate = () => {
       ));
   }, []);
 
-  const fetchCities = async (countryId) => {
+  const fetchCities = async (country) => {
     try {
-      const res = await API_BASE_URL.get('/countryCities/get', { country: countryId });
+      const res = await API_BASE_URL.get('/countryCities/get', { country });
       const cityList = res?.data?.data || [];
-      setAllCityData(cityList);
-      setCities(cityList.map(city => ({ value: city.id, label: city.name })));
+      setCities(cityList?.filter(city => city.countryName === country).map(city => ({ value: city.name, label: city.name })));
     } catch (err) {
       toast.error('Failed to fetch cities');
     }
@@ -66,38 +65,44 @@ const VendorCreate = () => {
       })
     )
   });
+ 
 
-  const dispatch = useDispatch();
+ const dispatch = useDispatch();
 
-  const onSubmit = (values, { setSubmitting }) => {
-    const contacts = values.contacts.map(c => ({
-      name: c.name,
-      email: c.email,
-      phoneNo: c.mobile,
-      isDefault: c.isDefault === 'yes'
-    }));
+const onSubmit = (values, { setSubmitting }) => {
+  
+  const contacts = values.contacts.map(c => ({
+    name: c.name,
+    email: c.email,
+    phoneNo: c.mobile,
+    isDefault: c.isDefault || false,
+  }));
 
-    const formData = {
-      vendorName: values.vendorName,
-      vendorCode: values.vendorCode,
-      vendorType: values.vendorType,
-      companyRegNo: values.companyRegNo,
-      taxRegNo: values.taxRegNo,
-      address1: values.address1,
-      address2: values.address2,
-      postalCode: values.postalCode,
-      country: values.country,
-      cityId: values.city,
-      bankAcctName: values.bankAcctName,
-      bankAccountNum: values.bankAccountNum,
-      bankName: values.bankName,
-      bankBranchName: values.bankBranchName,
-      bankSwiftCode: values.bankSwiftCode
-    };
-
-    dispatch(createVendorRequest({ formData, contacts }));
-    setSubmitting(false);
+  
+  const formData = {
+    vendorName: values.vendorName,
+    vendorCode: values.vendorCode,
+    vendorType: values.vendorType,
+    companyRegNo: values.companyRegNo,
+    taxRegNo: values.taxRegNo,
+    address1: values.address1,
+    address2: values.address2,
+    postalCode: values.postalCode,
+    country: values.country, 
+    cityId: values.city,    
+    createdBy: values.createdBy || null, 
   };
+
+  dispatch(createVendorRequest({
+    formData,
+    contacts,
+  }));
+
+  setSubmitting(false);
+};
+
+
+
 
   return (
     <div className="edit-vendor-container">
@@ -105,7 +110,7 @@ const VendorCreate = () => {
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
         {({ values, setFieldValue, isSubmitting }) => (
           <Form className="edit-vendor-form">
-            {/* --- Vendor Details --- */}
+           
             <div className="card-section">
               <h5>Vendor Details</h5>
               <div className="form-group">
@@ -135,7 +140,6 @@ const VendorCreate = () => {
               <div className="form-group">
                 <Select
                   options={currencies}
-                  placeholder="Currency"
                   value={currencies.find(c => c.value === values.defaultCurrencyId)}
                   onChange={(opt) => {
                     setFieldValue('defaultCurrencyId', opt.value);
@@ -146,7 +150,7 @@ const VendorCreate = () => {
               </div>
             </div>
 
-            {/* --- Address --- */}
+           
             <div className="card-section">
               <h5>Address</h5>
               <div className="form-group">
@@ -158,7 +162,7 @@ const VendorCreate = () => {
               </div>
               <div className="form-group">
                 <Field name="postalCode" placeholder="Postal Code" />
-                <ErrorMessage name="postalCode" component="div" className="error-text" />
+                 <ErrorMessage name="postalCode" component="div" className="error-text" />
               </div>
               <div className="form-group">
                 <Select
@@ -175,7 +179,7 @@ const VendorCreate = () => {
               </div>
               <div className="form-group">
                 <Select
-                  placeholder="City"
+                  placeholder="city"
                   options={cities}
                   value={cities.find(c => c.value === values.city)}
                   onChange={(opt) => setFieldValue('city', opt.value)}
@@ -184,7 +188,7 @@ const VendorCreate = () => {
               </div>
             </div>
 
-            {/* --- Bank Info --- */}
+            {/* BANK INFO */}
             <div className="card-section">
               <h5>Bank Info</h5>
               <div className="form-group"><Field name="bankAcctName" placeholder="Account Name" /></div>
@@ -194,7 +198,7 @@ const VendorCreate = () => {
               <div className="form-group"><Field name="bankSwiftCode" placeholder="SWIFT Code" /></div>
             </div>
 
-            {/* --- Contact Info --- */}
+            {/* CONTACT INFO */}
             <div className="contact-section">
               <h5>Contact Info</h5>
               <FieldArray name="contacts">
@@ -206,18 +210,30 @@ const VendorCreate = () => {
                     <tbody>
                       {values.contacts.map((contact, i) => (
                         <tr key={i}>
-                          <td><Field name={`contacts[${i}].name`} placeholder="Name" /></td>
-                          <td><Field name={`contacts[${i}].email`} placeholder="Email" /></td>
-                          <td><Field name={`contacts[${i}].mobile`} placeholder="Mobile" /></td>
+                          <td>
+                            <Field name={`contacts[${i}].name`} placeholder="Name" />
+                            <ErrorMessage name={`contacts[${i}].name`} component="div" className="error-text" />
+                          </td>
+                          <td>
+                            <Field name={`contacts[${i}].email`} placeholder="Email" />
+                            <ErrorMessage name={`contacts[${i}].email`} component="div" className="error-text" />
+                          </td>
+                          <td>
+                            <Field name={`contacts[${i}].mobile`} placeholder="Mobile" />
+                            <ErrorMessage name={`contacts[${i}].mobile`} component="div" className="error-text" />
+                          </td>
                           <td>
                             <Field as="select" name={`contacts[${i}].isDefault`}>
-                              <option value="no">No</option>
+                              <option value="">Select</option>
                               <option value="yes">Yes</option>
+                              <option value="no">No</option>
                             </Field>
                           </td>
                           <td>
                             {values.contacts.length > 1 && (
-                              <button type="button" onClick={() => remove(i)} className="btn-delete">Delete</button>
+                              <button type="button" className="btn-delete" onClick={() => remove(i)}>
+                                Delete
+                              </button>
                             )}
                           </td>
                         </tr>
@@ -238,6 +254,7 @@ const VendorCreate = () => {
             <div className="submit-form">
               <button type="submit" className="btn btn-submit" disabled={isSubmitting}>Create Vendor</button>
               <button type="button" className="btn btn-back" onClick={() => navigate('/dashboard')}>Cancel</button>
+             
             </div>
           </Form>
         )}

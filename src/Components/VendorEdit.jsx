@@ -32,86 +32,81 @@ const VendorEdit = () => {
     bankSwiftCode: '',
   });
 
-  
   useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const [countryRes, currencyRes] = await Promise.all([
-        API_BASE_URL.get('/meta/country'),
-        API_BASE_URL.get('/meta/currencies')
-      ]);
+    const fetchData = async () => {
+      try {
+        const [countryRes, currencyRes] = await Promise.all([
+          API_BASE_URL.get('/meta/country'),
+          API_BASE_URL.get('/meta/currencies')
+        ]);
 
-      const countryList = countryRes.data.data.map(c => ({ value: c.name, label: c.name }));
-      const currencyList = currencyRes.data.data.map(c => ({
-        value: c.name,
-        label: c.name,
-        id: c.id
-      }));
+        const countryList = countryRes.data.data.map(c => ({ value: c.name, label: c.name }));
+        const currencyList = currencyRes.data.data.map(c => ({
+          value: c.id,
+          label: c.name,
+          id: c.id
+        }));
 
-      setCountries(countryList);
-      setCurrencies(currencyList);
+        setCountries(countryList);
+        setCurrencies(currencyList);
 
-      if (id) {
-        const response = await API_BASE_URL.get(`/vendor/get/${id}`);
-        const v = response.data?.data;
+        if (id) {
+          const response = await API_BASE_URL.get(`/vendor/get/${id}`);
+          const v = response.data?.data;
 
-        if (v) {
-          if (v.country) {
-            await fetchCities(v.country); 
+          if (v) {
+            if (v.country) {
+              await fetchCities(v.country);
+            }
+
+            setFormData({
+              vendorName: v.vendorName || '',
+              vendorCode: v.vendorCode || '',
+              vendorType: v.vendorType || '',
+              taxRegNo: v.taxRegNo || '',
+              companyRegNo: v.companyRegNo || '',
+              defaultCurrencyId: currencyList.find(c => c.id === v.defaultCurrencyId)?.value || '',
+              address1: v.address1 || '',
+              address2: v.address2 || '',
+              postalCode: v.postalCode || '',
+              country: v.country || '',
+              city: v.city || '',
+              bankAcctName: v.bankAcctName || '',
+              bankAccountNum: v.bankAccountNum || '',
+              bankName: v.bankName || '',
+              bankBranchName: v.bankBranchName || '',
+              bankSwiftCode: v.bankSwiftCode || ''
+            });
+
+            setContacts(Array.isArray(v.contacts) ? v.contacts.map(c => ({
+              id: c.id || '',
+              name: c.name || '',
+              email: c.email || '',
+              phone: c.phone || '',
+              isDefault: c.isDefault || false
+            })) : []);
           }
-
-          setFormData({
-            vendorName: v.vendorName || '',
-            vendorCode: v.vendorCode || '',
-            vendorType: v.vendorType || '',
-            taxRegNo: v.taxRegNo || '',
-            companyRegNo: v.companyRegNo || '',
-            defaultCurrencyId: currencyList.find(c => c.label === v.defaultCurrency)?.value || '',
-            address1: v.address1 || '',
-            address2: v.address2 || '',
-            postalCode: v.postalCode || '',
-            country: v.country || '',
-            city: v.city || '', 
-            bankAcctName: v.bankAcctName || '',
-            bankAccountNum: v.bankAccountNum || '',
-            bankName: v.bankName || '',
-            bankBranchName: v.bankBranchName || '',
-            bankSwiftCode: v.bankSwiftCode || ''
-          });
-
-          
-          setContacts(Array.isArray(v.contacts) ? v.contacts.map(c => ({
-            id: c.id || '',
-            name: c.name || '',
-            email: c.email || '',
-            phone: c.phone || '',
-            isDefault: c.isDefault || false
-          })) : []);
         }
+      } catch (error) {
+        toast.error('Error loading vendor or metadata');
+        console.error(error);
       }
-    } catch (error) {
-      toast.error('Error loading vendor or metadata');
-      console.error(error);
-    }
-  };
+    };
 
-  fetchData();
-}, [id]);
-
-
-
+    fetchData();
+  }, [id]);
 
   const fetchCities = async (countryName) => {
-  try {
-    const response = await API_BASE_URL.get('/countryCities/get', { country: countryName });
+    try {
+      const response = await API_BASE_URL.get('/countryCities/get', { country: countryName });
 
-    const cityList = response.data?.data || [];
-    setCities(cityList?.filter(data => data.countryName === countryName)?.map(city => ({ label: city.name, value: city.name })) || []);
-  } catch (err) {
-    console.error('City fetch error:', err);
-    toast.error('Failed to fetch cities');
-  }
-};
+      const cityList = response.data?.data || [];
+      setCities(cityList?.filter(data => data.countryName === countryName)?.map(city => ({ label: city.name, value: city.name })) || []);
+    } catch (err) {
+      console.error('City fetch error:', err);
+      toast.error('Failed to fetch cities');
+    }
+  };
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -120,32 +115,31 @@ const VendorEdit = () => {
     }));
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    const payload = {
-      id,
-      ...formData,
-      contacts
-    };
+    try {
+      const payload = {
+        id,
+        ...formData,
+        contacts
+      };
 
-    const response = await API_BASE_URL.put(
-      '/vendor/update',
-      payload
-    );
+      const response = await API_BASE_URL.put(
+        '/vendor/update',
+        payload
+      );
 
-    if (response.status === 200) {
-      toast.success('Vendor updated successfully');
-    } else {
-      toast.error('Failed to update vendor');
+      if (response.status === 200) {
+        toast.success('Vendor updated successfully');
+      } else {
+        toast.error('Failed to update vendor');
+      }
+    } catch (err) {
+      console.error('Update error:', err);
+      toast.error('Error occurred while updating vendor');
     }
-  } catch (err) {
-    console.error('Update error:', err);
-    toast.error('Error occurred while updating vendor');
-  }
-};
-
+  };
 
   const addContact = () => {
     setContacts([...contacts, { name: '', email: '', phone: '', isDefault: false }]);
@@ -153,37 +147,36 @@ const VendorEdit = () => {
 
   const updateContact = (index, field, value) => {
     const updated = [...contacts];
-    console.log(contacts)
     updated[index][field] = value;
     setContacts(updated);
   };
 
   const deleteContact = async (index, contactId) => {
-  if (!contactId) {
-    
-    const updated = [...contacts];
-    updated.splice(index, 1);
-    setContacts(updated);
-    return;
-  }
-
-  try {
-    const res = await API_BASE_URL.post('/vendor/contact/delete', {
-      id: contactId
-    });
-
-    if (res.status === 200) {
-      toast.success('Contact deleted successfully');
+    if (!contactId) {
       const updated = [...contacts];
       updated.splice(index, 1);
       setContacts(updated);
-    } else {
-      toast.error('Failed to delete contact');
+      return;
     }
-  } catch (err) {
-    console.error('Delete error:', err);
-  }
-};
+
+    try {
+      const res = await API_BASE_URL.post('/vendor/contact/delete', {
+        id: contactId
+      });
+
+      if (res.status === 200) {
+        toast.success('Contact deleted successfully');
+        const updated = [...contacts];
+        updated.splice(index, 1);
+        setContacts(updated);
+      } else {
+        toast.error('Failed to delete contact');
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+    }
+  };
+
   return (
     <div className="edit-vendor-container">
       <div className='header'>
@@ -201,12 +194,12 @@ const VendorEdit = () => {
               <option>Individual</option>
             </select>
           </div>
-          <div className="form-group"><label>Tax Reg. No</label><input value={formData.taxRegNo} onChange={e => handleChange('taxReg', e.target.value)} /></div>
-          <div className="form-group"><label>Company Reg No</label><input value={formData.companyRegNo} onChange={e => handleChange('companyReg', e.target.value)} /></div>
+          <div className="form-group"><label>Tax Reg. No</label><input value={formData.taxRegNo} onChange={e => handleChange('taxRegNo', e.target.value)} /></div>
+          <div className="form-group"><label>Company Reg No</label><input value={formData.companyRegNo} onChange={e => handleChange('companyRegNo', e.target.value)} /></div>
           <div className="form-group"><label>Currency</label>
            <Select
               options={currencies}
-              value={currencies.filter(c => c.value === formData.defaultCurrencyId)}
+              value={currencies.find(c => c.value === formData.defaultCurrencyId)}
               onChange={(opt) => handleChange('defaultCurrencyId', opt.value)}
             />
           </div>
@@ -232,19 +225,18 @@ const VendorEdit = () => {
             <Select
               options={cities}
               value={cities.find(c => c.value === formData.city)}
-              onChange={(e) => handleChange('city', e.target.value)}
+              onChange={(e) => handleChange('city', e.value)}
             />
           </div>
         </div>
 
         <div className="card-section">
-          
           <h5>Bank Info</h5>
-          <div className="form-group"><label>Account Name</label><input value={formData.bankAcctName} onChange={e => handleChange('accountName', e.target.value)} /></div>
-          <div className="form-group"><label>Account Number</label><input value={formData.bankAccountNum} onChange={e => handleChange('accountNumber', e.target.value)} /></div>
+          <div className="form-group"><label>Account Name</label><input value={formData.bankAcctName} onChange={e => handleChange('bankAcctName', e.target.value)} /></div>
+          <div className="form-group"><label>Account Number</label><input value={formData.bankAccountNum} onChange={e => handleChange('bankAccountNum', e.target.value)} /></div>
           <div className="form-group"><label>Bank Name</label><input value={formData.bankName} onChange={e => handleChange('bankName', e.target.value)} /></div>
-          <div className="form-group"><label>Branch</label><input value={formData.bankBranchName} onChange={e => handleChange('branch', e.target.value)} /></div>
-          <div className="form-group"><label>SWIFT Code</label><input value={formData.bankSwiftCode} onChange={e => handleChange('swiftCode', e.target.value)} /></div>
+          <div className="form-group"><label>Branch</label><input value={formData.bankBranchName} onChange={e => handleChange('bankBranchName', e.target.value)} /></div>
+          <div className="form-group"><label>SWIFT Code</label><input value={formData.bankSwiftCode} onChange={e => handleChange('bankSwiftCode', e.target.value)} /></div>
         </div>
 
         <div className="card-section">
@@ -266,7 +258,7 @@ const VendorEdit = () => {
                   <td>{index + 1}</td>
                   <td><input placeholder='Name' value={contact.name} onChange={(e) => updateContact(index, 'name', e.target.value)} /></td>
                   <td><input placeholder='E-mail' value={contact.email} onChange={(e) => updateContact(index, 'email', e.target.value)} /></td>
-                  <td><input placeholder='Phone' value={contact.mobileNo} onChange={(e) => updateContact(index, 'phone', e.target.value)} /></td>
+                  <td><input placeholder='Phone' value={contact.phone} onChange={(e) => updateContact(index, 'phone', e.target.value)} /></td>
                   <td>
                     <select
                       value={contact.isDefault ? 'YES' : 'NO'}
@@ -277,7 +269,7 @@ const VendorEdit = () => {
                     </select>
                   </td>
                   <td>
-                <button className='btn-delete' type="button"  onClick={() => deleteContact(index, contact.id)}>Delete</button>
+                    <button className='btn-delete' type="button" onClick={() => deleteContact(index, contact.id)}>Delete</button>
                   </td>
                 </tr>
               ))}
@@ -286,12 +278,12 @@ const VendorEdit = () => {
           <button type="button" className="btn-add mt-2" onClick={addContact}>+ Add Contact</button>
         </div>
         <div className="submit-form" >
-         <button type="submit" className="btn btn-submit">Update Vendor</button>
-         <button type="button" className="btn btn-back" onClick={() => {
+          <button type="submit" className="btn btn-submit">Update Vendor</button>
+          <button type="button" className="btn btn-back" onClick={() => {
             navigate('/dashboard');
             toast.success('Fetched to Vendors')
           }}> Back</button>
-      </div>
+        </div>
       </form>
     </div>
   );
