@@ -1,6 +1,4 @@
-// src/redux/AccessCode/accessCodeSaga.js
 import { call, put, takeLatest } from 'redux-saga/effects';
-// import axiosInstance from '../../utils/axiosInstance';
 import {
   ACCESS_CODE_REQUEST,
   RESEND_OTP_REQUEST,
@@ -16,7 +14,8 @@ import API_BASE_URL from '../../Components/axiosInstance';
 function* accesscodeRequestSaga(action) {
   try {
     const response = yield call(() =>
-      API_BASE_URL.post('https://hastin-container.com/staging/app/auth/access-code/validate', action.payload)
+      API_BASE_URL.post('https://hastin-container.com/staging/app/auth/access-code/validate', action.payload),
+      API_BASE_URL.get('https://hastin-container.com/staging/app/auth/user-details', action.payload)
     );
     yield put(accesscodeSuccess(response.data));
   } catch (error) {

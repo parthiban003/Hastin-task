@@ -105,7 +105,7 @@ const VendorCreate = () => {
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
         {({ values, setFieldValue, isSubmitting }) => (
           <Form className="edit-vendor-form">
-            {/* --- Vendor Details --- */}
+           
             <div className="card-section">
               <h5>Vendor Details</h5>
               <div className="form-group">
@@ -146,7 +146,7 @@ const VendorCreate = () => {
               </div>
             </div>
 
-            {/* --- Address --- */}
+            
             <div className="card-section">
               <h5>Address</h5>
               <div className="form-group">
@@ -184,7 +184,7 @@ const VendorCreate = () => {
               </div>
             </div>
 
-            {/* --- Bank Info --- */}
+           
             <div className="card-section">
               <h5>Bank Info</h5>
               <div className="form-group"><Field name="bankAcctName" placeholder="Account Name" /></div>
@@ -194,7 +194,7 @@ const VendorCreate = () => {
               <div className="form-group"><Field name="bankSwiftCode" placeholder="SWIFT Code" /></div>
             </div>
 
-            {/* --- Contact Info --- */}
+           
             <div className="contact-section">
               <h5>Contact Info</h5>
               <FieldArray name="contacts">

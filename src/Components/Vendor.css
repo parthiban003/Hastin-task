@@ -72,7 +72,7 @@ h2 {
 
 .table-scroll {
   overflow-x: auto;
-  border-radius: 8px;
+  border-radius: 5px;
   background: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
@@ -97,7 +97,7 @@ h2 {
   background-color: #ffffff;
 }
 .vendor-table th {
-  background-color: #ced1d4;
+  background-color: #e4e7eb;
   font-weight: 700;
   font-size: 0.95rem;
   position: sticky;
@@ -109,6 +109,9 @@ h2 {
   vertical-align: middle;
   font-size: 0.85rem;
   color: #444;
+}
+.vendor-table tbody tr:hover {
+  background-color: #f9f9f9;
 }
 
 .badge {

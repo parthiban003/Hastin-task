@@ -44,7 +44,7 @@ const AccessCodeModal = ({ isOpen, onClose }) => {
     if (finalOpaque && finalAccessCode) {
       dispatch(accesscodeRequest({ opaque: finalOpaque, accessCode: Number(finalAccessCode) }));
       setSubmitted(true); 
-      toast.success('Login Successfully')
+      toast.success('Login Successfull')
       navigate('/dashboard')
     }
   };

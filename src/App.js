@@ -13,7 +13,6 @@ import AccessCodeModal from './Components/AccessCodeModal';
 function App() {
   return (
     <BrowserRouter>
-      
         <Routes>
           <Route path="/" element={<Form />} />
           <Route path='/' element={<AccessCodeModal />}/>
