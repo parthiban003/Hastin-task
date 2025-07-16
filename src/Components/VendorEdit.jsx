@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, data } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
 import { toast } from 'react-toastify';
-import './VendorEdit.css';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 import API_BASE_URL from './axiosInstance';
+import './VendorEdit.css';
 
 const VendorEdit = () => {
   const { id } = useParams();
@@ -13,39 +15,18 @@ const VendorEdit = () => {
   const [cities, setCities] = useState([]);
   const [currencies, setCurrencies] = useState([]);
   const [contacts, setContacts] = useState([]);
-  const [formData, setFormData] = useState({
-    vendorName: '',
-    vendorCode: '',
-    vendorType: '',
-    taxRegNo: '',
-    companyRegNo: '',
-    defaultCurrencyId: '',
-    address1: '',
-    address2: '',
-    postalCode: '',
-    country: '',
-    city: '',
-    bankAcctName: '',
-    bankAccountNum: '',
-    bankName: '',
-    bankBranchName: '',
-    bankSwiftCode: '',
-  });
+  const [initialValues, setInitialValues] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [countryRes, currencyRes] = await Promise.all([
           API_BASE_URL.get('/meta/country'),
-          API_BASE_URL.get('/meta/currencies')
+          API_BASE_URL.get('/meta/currencies'),
         ]);
 
         const countryList = countryRes.data.data.map(c => ({ value: c.id, label: c.name }));
-        const currencyList = currencyRes.data.data.map(c => ({
-          value: c.id,
-          label: c.name,
-          id: c.id
-        }));
+        const currencyList = currencyRes.data.data.map(c => ({ value: c.id, label: c.name }));
 
         setCountries(countryList);
         setCurrencies(currencyList);
@@ -54,44 +35,46 @@ const VendorEdit = () => {
           const response = await API_BASE_URL.get(`/vendor/get/${id}`);
           const v = response.data?.data;
 
-          if (v) {
-            if (v.country) {
-               const cityOptions = await fetchCities(v.country); 
-               setCities(cityOptions); 
-
-            }
-
-            setFormData({
-              vendorName: v.vendorName || '',
-              vendorCode: v.vendorCode || '',
-              vendorType: v.vendorType || '',
-              taxRegNo: v.taxRegNo || '',
-              companyRegNo: v.companyRegNo || '',
-              defaultCurrencyId: v.defaultCurrencyId || '',
-              address1: v.address1 || '',
-              address2: v.address2 || '',
-              postalCode: v.postalCode || '',
-              country: v.country || '',
-              city: v.cityId || '',
-              bankAcctName: v.bankAcctName || '',
-              bankAccountNum: v.bankAccountNum || '',
-              bankName: v.bankName || '',
-              bankBranchName: v.bankBranchName || '',
-              bankSwiftCode: v.bankSwiftCode || ''
-            });
-
-            setContacts(Array.isArray(v.contactList) ? v.contactList.map(c => ({
-                    id: c.id || '',
-                    name: c.name || '',
-                    email: c.email || '',
-                    phone: c.mobileNo || '',
-                    isDefault: c.isDefault || false
-                  })) : []);
+          if (v?.country) {
+            const cityOptions = await fetchCities(v.country);
+            setCities(cityOptions);
           }
+
+          setInitialValues({
+            vendorName: v.vendorName || '',
+            vendorCode: v.vendorCode || '',
+            vendorType: v.vendorType || '',
+            taxRegNo: v.taxRegNo || '',
+            companyRegNo: v.companyRegNo || '',
+            defaultCurrencyId: v.defaultCurrencyId || '',
+            address1: v.address1 || '',
+            address2: v.address2 || '',
+            postalCode: v.postalCode || '',
+            country: v.country || '',
+            city: v.cityId || '',
+            bankAcctName: v.bankAcctName || '',
+            bankAccountNum: v.bankAccountNum || '',
+            bankName: v.bankName || '',
+            bankBranchName: v.bankBranchName || '',
+            bankSwiftCode: v.bankSwiftCode || '',
+            contacts: (v.contactList || []).map(c => ({
+              id: c.id,
+              name: c.name,
+              email: c.email,
+              phone: c.mobileNo,
+              isDefault: c.isDefault ? 'YES' : 'NO',
+            })),
+          });
+          setContacts((v.contactList || []).map(c => ({
+            id: c.id,
+            name: c.name,
+            email: c.email,
+            phone: c.mobileNo,
+            isDefault: c.isDefault ? 'YES' : 'NO',
+          })));
         }
       } catch (error) {
         toast.error('Error loading vendor or metadata');
-        console.error(error);
       }
     };
 
@@ -99,223 +82,223 @@ const VendorEdit = () => {
   }, [id]);
 
   const fetchCities = async (countryId) => {
-  try {
-    const response = await API_BASE_URL.get('/countryCities/get', {
-      params: { country: countryId } 
-    });
+    try {
+      const res = await API_BASE_URL.get('/countryCities/get', {
+        params: { country: countryId },
+      });
 
-    const cityList = response.data?.data || [];
-    const formatted = cityList?.filter(data => data.countryId === countryId)?.map(city => ({ label: city.name, value: city.id })) || [];
-
-    setCities(formatted);
-    return formatted;
-  } catch (err) {
-    console.error('City fetch error:', err);
-    toast.error('Failed to fetch cities');
-    return [];
-  }
-};
-
-
-  const handleChange = (field, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-   const payload = {
-  id,
-  vendorName: formData.vendorName,
-  vendorCode: formData.vendorCode,
-  vendorType: formData.vendorType,
-  taxRegNo: formData.taxRegNo,
-  companyRegNo: formData.companyRegNo,
-  defaultCurrencyId: typeof formData.defaultCurrencyId === 'object' ? formData.defaultCurrencyId.value : formData.defaultCurrencyId,
-  address1: formData.address1,
-  address2: formData.address2,
-  postalCode: formData.postalCode,
-  countryId: typeof formData.country === 'object' ? formData.country.value : formData.country,
-  cityId: typeof formData.city === 'object' ? formData.city.value : formData.city,
-  bankAcctName: formData.bankAcctName,
-  bankAccountNum: formData.bankAccountNum,
-  bankName: formData.bankName,
-  bankBranchName: formData.bankBranchName,
-  bankSwiftCode: formData.bankSwiftCode,
-  contacts: contacts.map(c => ({
-    id: c.id || undefined,
-    name: c.name,
-    email: c.email,
-    mobileNo: c.phone,
-    isDefault: c.isDefault,
-  })),
-};
-
-    console.log("Submitting payload:", payload);
-
-    const response = await API_BASE_URL.put('/vendor/update', payload);
-
-    if (response.status === 200) {
-      toast.success('Vendor updated successfully');
-    } else {
-      toast.error('Failed to update vendor');
+      const data = res.data?.data || [];
+      return data.map(c => ({ label: c.name, value: c.id, countryId: c.countryId }));
+    } catch (error) {
+      toast.error('Failed to fetch cities');
+      return [];
     }
-  } catch (err) {
-    console.error('Update error:', err);
-    toast.error('Error occurred while updating vendor');
-  }
-};
-
-  const addContact = () => {
-    setContacts([...contacts, { name: '', email: '', phone: '', isDefault: false }]);
   };
 
-  const updateContact = (index, field, value) => {
-    const updated = [...contacts];
-    updated[index][field] = value;
-    setContacts(updated);
-  };
+  const validationSchema = Yup.object().shape({
+    vendorName: Yup.string().required('Required'),
+    vendorCode: Yup.string().required('Required'),
+    vendorType: Yup.string().required('Required'),
+    taxRegNo: Yup.string().required('Required'),
+    companyRegNo: Yup.string().required('Required'),
+    defaultCurrencyId: Yup.string().required('Required'),
+    address1: Yup.string().required('Required'),
+    country: Yup.string().required('Required'),
+    city: Yup.string().required('Required'),
+    contacts: Yup.array().of(
+      Yup.object().shape({
+        name: Yup.string().required('Required'),
+        email: Yup.string().email('Invalid email').required('Required'),
+        phone: Yup.string().required('Required'),
+        isDefault: Yup.string().oneOf(['YES', 'NO']).required('Required'),
+      })
+    ),
+  });
 
-  const deleteContact = async (index, contactId) => {
-    if (!contactId) {
-      const updated = [...contacts];
-      updated.splice(index, 1);
-      setContacts(updated);
+  const handleSubmit = async (values) => {
+    const formattedContacts = values.contacts.map(c => ({
+      id: c.id,
+      name: c.name,
+      email: c.email,
+      mobileNo: c.phone,
+      isDefault: c.isDefault === 'YES',
+    }));
+
+    const defaultCount = formattedContacts.filter(c => c.isDefault).length;
+    if (defaultCount !== 1) {
+      toast.error("Exactly one contact must be marked as default.");
       return;
     }
 
-    try {
-      const res = await API_BASE_URL.post('/vendor/contact/delete', {
-        id: contactId
-      });
+    const payload = {
+      id,
+      vendorName: values.vendorName,
+      vendorCode: values.vendorCode,
+      vendorType: values.vendorType,
+      taxRegNo: values.taxRegNo,
+      companyRegNo: values.companyRegNo,
+      defaultCurrencyId: values.defaultCurrencyId,
+      address1: values.address1,
+      address2: values.address2,
+      postalCode: values.postalCode,
+       country: values.country,
+      cityId: values.city,
+      bankAcctName: values.bankAcctName,
+      bankAccountNum: values.bankAccountNum,
+      bankName: values.bankName,
+      bankBranchName: values.bankBranchName,
+      bankSwiftCode: values.bankSwiftCode,
+      contacts: formattedContacts,
+    };
 
+    try {
+      const res = await API_BASE_URL.put('/vendor/update', payload);
       if (res.status === 200) {
-        toast.success('Contact deleted successfully');
-        const updated = [...contacts];
-        updated.splice(index, 1);
-        setContacts(updated);
+        toast.success('Vendor updated successfully');
       } else {
-        toast.error('Failed to delete contact');
+        toast.error('Update failed');
       }
     } catch (err) {
-      console.error('Delete error:', err);
+      toast.error('Error occurred while updating vendor');
     }
   };
+
+  if (!initialValues) return <p>Loading...</p>;
 
   return (
     <div className="edit-vendor-container">
       <div className='header'>
         <h2>Edit Vendor</h2>
       </div><br />
-      <form className="edit-vendor-form" onSubmit={handleSubmit}>
-        <div className="card-section">
-          <h5>Basic Info</h5>
-          <div className="form-group"><label>Vendor Name</label><input value={formData.vendorName} onChange={e => handleChange('vendorName', e.target.value)} /></div>
-          <div className="form-group"><label>Vendor Code</label><input value={formData.vendorCode} onChange={e => handleChange('vendorCode', e.target.value)} /></div>
-          <div className="form-group"><label>Vendor Type</label>
-            <select value={formData.vendorType} onChange={e => handleChange('vendorType', e.target.value)}>
-              <option value="">Select</option>
-              <option>Company</option>
-              <option>Individual</option>
-            </select>
-          </div>
-          <div className="form-group"><label>Tax Reg. No</label><input value={formData.taxRegNo} onChange={e => handleChange('taxRegNo', e.target.value)} /></div>
-          <div className="form-group"><label>Company Reg No</label><input value={formData.companyRegNo} onChange={e => handleChange('companyRegNo', e.target.value)} /></div>
-          <div className="form-group"><label>Currency</label>
-            <Select
-              options={currencies}
-              value={currencies.find(c => c.value === formData.defaultCurrencyId)}
-              onChange={(opt) => handleChange('defaultCurrencyId', opt.value)}
-            />
-          </div>
-        </div>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ values, setFieldValue }) => (
+          <Form className="edit-vendor-form">
+            <div className="card-section">
+              <h5>Basic Info</h5>
+              <div className="form-group"><label>Vendor Name</label><Field name="vendorName" /><ErrorMessage name="vendorName" component="div" className="error" /></div>
+              <div className="form-group"><label>Vendor Code</label><Field name="vendorCode" /><ErrorMessage name="vendorCode" component="div" className="error" /></div>
+              <div className="form-group"><label>Vendor Type</label>
+                <Field as="select" name="vendorType">
+                  <option value="">Select</option>
+                  <option>Company</option>
+                  <option>Individual</option>
+                </Field>
+                <ErrorMessage name="vendorType" component="div" className="error" />
+              </div>
+              <div className="form-group"><label>Tax Reg. No</label><Field name="taxRegNo" /><ErrorMessage name="taxRegNo" component="div" className="error" /></div>
+              <div className="form-group"><label>Company Reg No</label><Field name="companyRegNo" /><ErrorMessage name="companyRegNo" component="div" className="error" /></div>
+              <div className="form-group"><label>Currency</label>
+                <Field as="select" name="defaultCurrencyId">
+                  <option value="">Select Currency</option>
+                  {currencies.map(c => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </Field>
+                <ErrorMessage name="defaultCurrencyId" component="div" className="error" />
+              </div>
+            </div>
 
-        <div className="card-section">
-          <h5>Address</h5>
-          <div className="form-group"><label>Address 1</label><input value={formData.address1} onChange={e => handleChange('address1', e.target.value)} /></div>
-          <div className="form-group"><label>Address 2</label><input value={formData.address2} onChange={e => handleChange('address2', e.target.value)} /></div>
-          <div className="form-group"><label>Postal Code</label><input value={formData.postalCode} onChange={e => handleChange('postalCode', e.target.value)} /></div>
-          <div className="form-group"><label>Country</label>
-           <Select
-                  options={countries}
-                  value={countries.find(c => c.value === formData.country)}
-                  onChange={(opt) => {
-                    handleChange('country', opt.value);
-                    fetchCities(opt.value);
-                    handleChange('city', '');
-                  }}
-                 />
-          </div>
+            <div className="card-section">
+              <h5>Address</h5>
+              <div className="form-group"><label>Address 1</label><Field name="address1" /><ErrorMessage name="address1" component="div" className="error" /></div>
+              <div className="form-group"><label>Address 2</label><Field name="address2" /></div>
+              <div className="form-group"><label>Postal Code</label><Field name="postalCode" /></div>
+              <div className="form-group"><label>Country</label>
+                <Field as="select" name="country" onChange={async (e) => {
+                  const value = e.target.value;
+                  setFieldValue('country', value);
+                  setFieldValue('city', '');
+                  const updatedCities = await fetchCities(value);
+                  setCities(updatedCities);
+                }}>
+                  <option value="">Select Country</option>
+                  {countries.map(c => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </Field>
+                <ErrorMessage name="country" component="div" className="error" />
+              </div>
+              <div className="form-group"><label>City</label>
+                <Field as="select" name="city">
+                  <option value="">Select City</option>
+                  {cities
+                    .filter(city => city.countryId === values.country)
+                    .map(c => (
+                      <option key={c.value} value={c.value}>{c.label}</option>
+                    ))}
+                </Field>
+                <ErrorMessage name="city" component="div" className="error" />
+              </div>
+            </div>
 
-          <div className="form-group"><label>City</label>
-           <Select
-                options={cities}
-                value={cities.find(c => c.value === formData.city) || null}
-                onChange={(opt) => handleChange('city', opt.value)}
-              />
-          </div>
+            <div className="card-section">
+              <h5>Bank Info</h5>
+              <div className="form-group"><label>Account Name</label><Field name="bankAcctName" /></div>
+              <div className="form-group"><label>Account Number</label><Field name="bankAccountNum" /></div>
+              <div className="form-group"><label>Bank Name</label><Field name="bankName" /></div>
+              <div className="form-group"><label>Branch</label><Field name="bankBranchName" /></div>
+              <div className="form-group"><label>SWIFT Code</label><Field name="bankSwiftCode" /></div>
+            </div>
 
-        </div>
+            <div className="card-section">
+              <h5>Contact Info</h5>
+              <table className="contact-table">
+                <thead>
+                  <tr>
+                    <th>S.NO</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Is Default</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {values.contacts.map((contact, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td><Field name={`contacts[${index}].name`} placeholder="Name" /></td>
+                      <td><Field name={`contacts[${index}].email`} placeholder="Email" /></td>
+                      <td><Field name={`contacts[${index}].phone`} placeholder="Phone" /></td>
+                      <td>
+                        <Field as="select" name={`contacts[${index}].isDefault`}>
+                          <option value="NO">NO</option>
+                          <option value="YES">YES</option>
+                        </Field>
+                      </td>
+                      <td>
+                        <button type="button" className="btn-delete" onClick={() => {
+                          const updated = [...contacts];
+                          updated.splice(index, 1);
+                          setContacts(updated);
+                          setFieldValue('contacts', updated);
+                        }}>Delete</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <button type="button" className="btn-add mt-2" onClick={() => {
+                const updated = [...contacts, { name: '', email: '', phone: '', isDefault: 'NO' }];
+                setContacts(updated);
+                setFieldValue('contacts', updated);
+              }}>+ Add Contact</button>
+            </div>
 
-        <div className="card-section">
-          <h5>Bank Info</h5>
-          <div className="form-group"><label>Account Name</label><input value={formData.bankAcctName} onChange={e => handleChange('bankAcctName', e.target.value)} /></div>
-          <div className="form-group"><label>Account Number</label><input value={formData.bankAccountNum} onChange={e => handleChange('bankAccountNum', e.target.value)} /></div>
-          <div className="form-group"><label>Bank Name</label><input value={formData.bankName} onChange={e => handleChange('bankName', e.target.value)} /></div>
-          <div className="form-group"><label>Branch</label><input value={formData.bankBranchName} onChange={e => handleChange('bankBranchName', e.target.value)} /></div>
-          <div className="form-group"><label>SWIFT Code</label><input value={formData.bankSwiftCode} onChange={e => handleChange('bankSwiftCode', e.target.value)} /></div>
-        </div>
-
-        <div className="card-section">
-          <h5>Contact Info</h5>
-          <table className="contact-table">
-            <thead>
-              <tr>
-                <th>S.NO</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Is Default</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contacts.map((contact, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td><input placeholder='Name' value={contact.name} onChange={(e) => updateContact(index, 'name', e.target.value)} /></td>
-                  <td><input placeholder='E-mail' value={contact.email} onChange={(e) => updateContact(index, 'email', e.target.value)} /></td>
-                  <td><input placeholder='Phone' value={contact.phone} onChange={(e) => updateContact(index, 'phone', e.target.value)} /></td>
-                  <td>
-                    <select
-                      value={contact.isDefault ? 'YES' : 'NO'}
-                      onChange={(e) => updateContact(index, 'isDefault', e.target.value === 'YES')}
-                    >
-                      <option value="NO">NO</option>
-                      <option value="YES">YES</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button className='btn-delete' type="button" onClick={() => deleteContact(index, contact.id)}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <button type="button" className="btn-add mt-2" onClick={addContact}>+ Add Contact</button>
-        </div>
-        <div className="submit-form" >
-          <button type="submit" className="btn btn-submit">Update Vendor</button>
-          <button type="button" className="btn btn-back" onClick={() => {
-            navigate('/dashboard');
-            toast.success('Fetched to Vendors')
-          }}> Back</button>
-        </div>
-      </form>
+            <div className="submit-form">
+              <button type="submit" className="btn btn-submit">Update Vendor</button>
+              <button type="button" className="btn btn-back" onClick={() => {
+                navigate('/dashboard');
+                toast.success('Fetched to Vendors');
+              }}>Back</button>
+            </div>
+          </Form>
+        )}
+      </Formik>
     </div>
   );
 };
