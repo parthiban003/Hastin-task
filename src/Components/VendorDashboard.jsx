@@ -124,7 +124,6 @@ const VendorDashboard = () => {
           type="text"
           id='vendor-search'
           name='search'
-          title='Search'
           placeholder="Search"
           className="search-input"
           value={searchTerm}

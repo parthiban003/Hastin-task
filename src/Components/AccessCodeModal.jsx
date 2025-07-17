@@ -46,6 +46,7 @@ const AccessCodeModal = ({ isOpen, onClose }) => {
       setSubmitted(true); 
       toast.success('Login Successfull')
       navigate('/dashboard')
+      toast.success('fetched to vendors')
     }
   };
 

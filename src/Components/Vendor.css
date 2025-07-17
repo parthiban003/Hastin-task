@@ -14,7 +14,9 @@
   display: flex;
   gap: 12px;
 }
-
+.logout-btn {
+  background-color: blue;
+}
 h2 {
   font-family: 'Times New Roman', Times, serif;
   font-weight: 600;

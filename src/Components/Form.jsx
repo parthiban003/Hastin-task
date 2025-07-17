@@ -121,7 +121,6 @@ const LoginPage = () => {
 
           <br />
           <a href="/" className="forgot-link" title='forget password?'>🔒 Forgot password?</a><br /><br />
-
           <button type="submit" className="login-btn" disabled={isLoading}>
             {isLoading ? <Loader size="md" /> : 'Login'}
           </button>
@@ -131,7 +130,6 @@ const LoginPage = () => {
             onClose={() => setModalVisible(false)}
           />
         </form>
-
       </div>
     </div>
   );

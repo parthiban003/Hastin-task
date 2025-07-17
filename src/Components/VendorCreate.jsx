@@ -32,7 +32,7 @@ const VendorCreate = () => {
       const res = await API_BASE_URL.get('/countryCities/get', { country: countryId });
       const cityList = res?.data?.data || [];
       setAllCityData(cityList);
-      setCities(cityList.map(city => ({ value: city.id, label: city.name })));
+      setCities(cityList?.filter(data => data.countryId === countryId)?.map(city => ({ label: city.name, value: city.name })) || []);
     } catch (err) {
       toast.error('Failed to fetch cities');
     }
