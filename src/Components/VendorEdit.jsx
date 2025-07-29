@@ -263,7 +263,7 @@ const VendorEdit = () => {
                       <td>{index + 1}</td>
                       <td><Field name={`contacts[${index}].name`} placeholder="Name" /></td>
                       <td><Field name={`contacts[${index}].email`} placeholder="Email" /></td>
-                      <td><Field name={`contacts[${index}].phone`} placeholder="Phone" /></td>
+                      <td><Field name={`contacts[${index}].phone`} placeholder="Phone" type="number"/></td>
                       <td>
                         <Field as="select" name={`contacts[${index}].isDefault`}>
                           <option value="NO">NO</option>

@@ -208,7 +208,7 @@ const VendorCreate = () => {
                         <tr key={i}>
                           <td><Field name={`contacts[${i}].name`} placeholder="Name" /></td>
                           <td><Field name={`contacts[${i}].email`} placeholder="Email" /></td>
-                          <td><Field name={`contacts[${i}].mobile`} placeholder="Mobile" /></td>
+                          <td><Field name={`contacts[${i}].mobile`} placeholder="Mobile" type="number"/></td>
                           <td>
                             <Field as="select" name={`contacts[${i}].isDefault`}>
                               <option value="no">No</option>
